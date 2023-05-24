@@ -378,6 +378,14 @@ optional = false
 python-versions = ">=3.8"
 
 [[package]]
+name = "orjson"
+version = "3.8.13"
+description = "Fast, correct Python JSON library supporting dataclasses, datetimes, and numpy"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[[package]]
 name = "packaging"
 version = "23.1"
 description = "Core utilities for Python packages"
@@ -779,7 +787,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "flake8 (<5)", "pytest-co
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "a31cba4114913d6b9b11fbf9f929411f3863ff79c5b52efb55fd09f783cc5189"
+content-hash = "3abbe287dde304c70017878a354eb1b7cee5447abeddb7e99a557594b2b707d4"
 
 [metadata.files]
 alabaster = []
@@ -848,6 +856,7 @@ mypy = [
 mypy-extensions = []
 nodeenv = []
 numpy = []
+orjson = []
 packaging = []
 pathspec = []
 platformdirs = []

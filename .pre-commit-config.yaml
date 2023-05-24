@@ -32,6 +32,7 @@ repos:
         stages: [commit]
         language: system
         entry: poetry run mypy
+        args: [--strict, --ignore-missing-imports]
         types: [python]
         pass_filenames: True
         exclude: docs/
