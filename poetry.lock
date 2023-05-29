@@ -584,6 +584,36 @@ typing-extensions = {version = ">=4.0.0,<5.0", markers = "python_version < \"3.9
 jupyter = ["ipywidgets (>=7.5.1,<9)"]
 
 [[package]]
+name = "slack-bolt"
+version = "1.18.0"
+description = "The Bolt Framework for Python"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+slack-sdk = ">=3.21.2,<4"
+
+[package.extras]
+adapter = ["boto3 (<=2)", "bottle (>=0.12,<1)", "chalice (>=1.28,<2)", "CherryPy (>=18,<19)", "Django (>=3,<5)", "falcon (>=2,<4)", "fastapi (>=0.70.0,<1)", "Flask (>=1,<3)", "Werkzeug (>=2,<3)", "pyramid (>=1,<3)", "sanic (>=22,<23)", "starlette (>=0.14,<1)", "tornado (>=6,<7)", "uvicorn (<1)", "gunicorn (>=20,<21)", "websocket-client (>=1.2.3,<2)"]
+adapter_testing = ["moto (>=3,<4)", "docker (>=5,<6)", "boddle (>=0.2,<0.3)", "Flask (>=1,<2)", "Werkzeug (>=1,<2)", "sanic-testing (>=0.7)", "requests (>=2,<3)"]
+async = ["aiohttp (>=3,<4)", "websockets (>=10,<11)"]
+testing = ["pytest (>=6.2.5,<7)", "pytest-cov (>=3,<4)", "Flask-Sockets (>=0.2,<1)", "Werkzeug (>=1,<2)", "itsdangerous (==2.0.1)", "Jinja2 (==3.0.3)", "black (==22.8.0)", "click (<=8.0.4)", "pytest-asyncio (>=0.18.2,<1)", "aiohttp (>=3,<4)"]
+testing_without_asyncio = ["pytest (>=6.2.5,<7)", "pytest-cov (>=3,<4)", "Flask-Sockets (>=0.2,<1)", "Werkzeug (>=1,<2)", "itsdangerous (==2.0.1)", "Jinja2 (==3.0.3)", "black (==22.8.0)", "click (<=8.0.4)"]
+
+[[package]]
+name = "slack-sdk"
+version = "3.21.3"
+description = "The Slack API Platform SDK for Python"
+category = "main"
+optional = false
+python-versions = ">=3.6.0"
+
+[package.extras]
+optional = ["aiodns (>1.0)", "aiohttp (>=3.7.3,<4)", "boto3 (<=2)", "SQLAlchemy (>=1.4,<3)", "websockets (>=10,<11)", "websocket-client (>=1,<2)"]
+testing = ["pytest (>=6.2.5,<7)", "pytest-asyncio (<1)", "Flask-Sockets (>=0.2,<1)", "Flask (>=1,<2)", "Werkzeug (<2)", "itsdangerous (==1.1.0)", "Jinja2 (==3.0.3)", "pytest-cov (>=2,<3)", "flake8 (>=5,<6)", "black (==22.8.0)", "click (==8.0.4)", "psutil (>=5,<6)", "databases (>=0.5)", "boto3 (<=2)", "moto (>=3,<4)"]
+
+[[package]]
 name = "sniffio"
 version = "1.3.0"
 description = "Sniff out which async library your code is running under"
@@ -787,7 +817,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "flake8 (<5)", "pytest-co
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "3abbe287dde304c70017878a354eb1b7cee5447abeddb7e99a557594b2b707d4"
+content-hash = "7c9245d214a4f6b5afa34444d262f87b0b1b5ca42cae10119581b25a870ed8cf"
 
 [metadata.files]
 alabaster = []
@@ -957,6 +987,8 @@ pyyaml = [
 ]
 requests = []
 rich = []
+slack-bolt = []
+slack-sdk = []
 sniffio = []
 snowballstemmer = []
 sphinx = []
