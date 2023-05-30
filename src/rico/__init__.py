@@ -4,7 +4,7 @@ __author__ = """Hank Corbett"""
 __email__ = "htc@unc.edu"
 __version__ = "0.1.0"
 
-__all__ = ["RicoHeartBeat"]
+__all__ = ["RicoHeartBeat", "RawStreamer"]
 
 import logging
 import os
@@ -34,7 +34,8 @@ class Config(object):
 
     KAFKA_ADDR = os.environ.get("KAFKA_ADDR") or "152.2.38.172"
     KAFKA_PORT = os.environ.get("KAFKA_PORT") or "9092"
-    HBEAT_TOPIC = os.environ.get("HBEAT_TOPIC") or "rico-hearbeat"
+    HBEAT_TOPIC = os.environ.get("HBEAT_TOPIC") or "rico.heartbeat"
+    RAW_TOPIC_BASE = os.environ.get("RAW_TOPIC_BASE") or "rico.candidates.raw"
 
 
 config = Config()
@@ -73,3 +74,4 @@ get_logger(__name__).addHandler(logging.StreamHandler())
 
 
 from .heartbeat import RicoHeartBeat  # noqa: E402
+from .raw_streamer import RawStreamer  # noqa: E402

@@ -5,7 +5,7 @@ description = "Transient alert generation for Argus and Evryscope"
 authors = ["Hank Corbett"]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = ">=3.9,<4.0"
 python-dotenv = "^0.18.0"
 fastavro = "^1.4.12"
 pyarrow = "^8.0.0"
@@ -16,6 +16,8 @@ click = "^8.1.3"
 black = "^23.3.0"
 orjson = "^3.8.13"
 slack-bolt = "^1.18.0"
+blosc = "^1.11.1"
+astropy = "^5.3"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2"

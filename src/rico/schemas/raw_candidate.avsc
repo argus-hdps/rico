@@ -1,0 +1,185 @@
+{
+    "doc": "avro alert schema, evryscope/argus optical array.",
+    "name": "raw_candidate",
+    "namespace": "rico",
+    "type": "record",
+    "version": "0.1",
+    "fields": [
+        {
+            "name": "epoch", 
+            "type": "float"
+        },
+        {
+            "name": "camera", 
+            "type": "string"
+        },
+        {
+            "name": "thresh",
+            "type": "float"
+        },
+        {
+            "name": "npix",
+            "type": "int"
+        },
+        {
+            "name": "tnpix",
+            "type": "int"
+        },
+        {
+            "name": "xmin",
+            "type": "int"
+        },
+        {
+            "name": "xmax",
+            "type": "int"
+        },
+        {
+            "name": "ymin",
+            "type": "int"
+        },
+        {
+            "name": "ymax",
+            "type": "int"
+        },
+        {
+            "name": "xcentroid",
+            "type": "float"
+        },
+        {
+            "name": "ycentroid",
+            "type": "float"
+        },
+        {
+            "name": "x2",
+            "type": "float"
+        },
+        {
+            "name": "y2",
+            "type": "float"
+        },
+        {
+            "name": "xy",
+            "type": "float"
+        },
+        {
+            "name": "errx2",
+            "type": "float"
+        },
+        {
+            "name": "erry2",
+            "type": "float"
+        },
+        {
+            "name": "errxy",
+            "type": "float"
+        },
+        {
+            "name": "a",
+            "type": "float"
+        },
+        {
+            "name": "b",
+            "type": "float"
+        },
+        {
+            "name": "theta",
+            "type": "float"
+        },
+        {
+            "name": "cxx",
+            "type": "float"
+        },
+        {
+            "name": "cyy",
+            "type": "float"
+        },
+        {
+            "name": "cxy",
+            "type": "float"
+        },
+        {
+            "name": "cflux",
+            "type": "float"
+        },
+        {
+            "name": "flux",
+            "type": "float"
+        },
+        {
+            "name": "cpeak",
+            "type": "float"
+        },
+        {
+            "name": "peak",
+            "type": "float"
+        },
+        {
+            "name": "xcpeak",
+            "type": "int"
+        },
+        {
+            "name": "ycpeak",
+            "type": "int"
+        },
+        {
+            "name": "xpeak",
+            "type": "int"
+        },
+        {
+            "name": "ypeak",
+            "type": "int"
+        },
+        {
+            "name": "flag",
+            "type": "int"
+        },
+        {
+            "name": "aper_sum_bkgsub",
+            "type": "float"
+        },
+        {
+            "name": "annulus_rms",
+            "type": "float"
+        },
+        {
+            "name": "difsnr",
+            "type": "float"
+        },
+        {
+            "name": "hfd",
+            "type": "float"
+        },
+        {
+            "name": "sign_ratio",
+            "type": "float"
+        },
+        {
+            "name": "insmag",
+            "type": "float"
+        },
+        {
+            "name": "zpoint",
+            "type": "float"
+        },
+        {
+            "name": "gmag",
+            "type": "float"
+        },
+        {
+            "name": "srcsnr",
+            "type": "float"
+        },
+        {
+            "name": "ra",
+            "type": "float"
+        },
+        {
+            "name": "dec",
+            "type": "float"
+        },
+        {
+            "name": "stamp",
+            "type": "bytes"
+        }
+    ]
+}

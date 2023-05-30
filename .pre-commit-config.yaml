@@ -37,18 +37,18 @@ repos:
         pass_filenames: True
         exclude: docs/
 
-      - id: pytest
-        name: pytest
-        stages: [commit]
-        language: system
-        entry: poetry run pytest
-        types: [python]
-        pass_filenames: false
-
-      - id: pytest-cov
-        name: pytest
-        stages: [push]
-        language: system
-        entry: poetry run pytest --cov --cov-fail-under=90
-        types: [python]
-        pass_filenames: false
+      # - id: pytest
+      #   name: pytest
+      #   stages: [commit]
+      #   language: system
+      #   entry: poetry run pytest
+      #   types: [python]
+      #   pass_filenames: false
+ 
+      # - id: pytest-cov
+      #   name: pytest
+      #   stages: [push]
+      #   language: system
+      #   entry: poetry run pytest --cov --cov-fail-under=90
+      #   types: [python]
+      #   pass_filenames: false

@@ -14,6 +14,12 @@ slack_app = App(
 )
 
 
+@slack_app.message("hi Rico")
+def message_hello(message: Dict[str, Any], say: Callable[..., None]) -> None:
+    # say() sends a message to the channel where the event was triggered
+    say(f"Hey there <@{message['user']}>!", thread_ts=message["ts"])
+
+
 @slack_app.event("reaction_added")
 def telescope_trigger(
     body: Dict[str, Any], ack: Callable[..., None], say: Callable[..., None]

@@ -2,9 +2,25 @@ __all__ = ["RicoHeartBeat"]
 
 import datetime
 import threading
+from typing import Any, Callable, Dict, Optional, Tuple
 
 from . import config
 from .producer import Producer
+
+
+class RepeatTimer(threading.Timer):
+    finished: threading.Event
+    interval: float
+    function: Callable[..., Any]
+    args: Tuple[Any, ...]
+    kwargs: Dict[str, Any]
+
+    def run(self) -> None:
+        while not self.finished.wait(self.interval):
+            assert self.function is not None
+            assert self.args is not None
+            assert self.kwargs is not None
+            self.function(*self.args, **self.kwargs)
 
 
 class RicoHeartBeat(Producer):
@@ -19,8 +35,10 @@ class RicoHeartBeat(Producer):
         using the keys 'KAFKA_ADDR', 'KAFKA_PORT', and 'HBEAT_TOPIC' respectively.
         """
         super().__init__(
-            host=config.KAFKA_ADDR, port=config.KAFKA_PORT, topic=config.HBEAT_TOPIC
+            host=config.KAFKA_ADDR,
+            port=config.KAFKA_PORT,
         )
+        self.heartbeat_thread: Optional[RepeatTimer] = None
 
     def send_heartbeat(self) -> None:
         """
@@ -28,7 +46,7 @@ class RicoHeartBeat(Producer):
 
         The message is a dictionary containing the current UTC time.
         """
-        self.send({"utc": datetime.datetime.utcnow()})
+        self.send_json({"utc": datetime.datetime.utcnow()}, config.HBEAT_TOPIC)
 
     def start(self, rate: int = 30) -> None:
         """
@@ -38,4 +56,12 @@ class RicoHeartBeat(Producer):
             rate (int): The rate at which heartbeat messages should be sent, in seconds.
                         Defaults to 30 seconds.
         """
-        threading.Timer(rate, self.send_heartbeat).start()
+        self.heartbeat_thread = RepeatTimer(rate, self.send_heartbeat)
+        self.heartbeat_thread.start()
+
+    def stop(self) -> None:
+        """
+        Stop sending heartbeat messages periodically.
+        """
+        if self.heartbeat_thread is not None:
+            self.heartbeat_thread.cancel()

@@ -13,9 +13,7 @@ app = FastAPI()
 
 
 @app.get("/goodnight", response_model=Gracie)
-async def goodnight():
-    app.is_exposing = True
-
+async def goodnight() -> Gracie:
     goodnight = Gracie(name="Gracie", hello_utc=datetime.datetime.now())
 
     return goodnight

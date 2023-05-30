@@ -24,6 +24,27 @@ test = ["coverage[toml] (>=4.5)", "hypothesis (>=4.0)", "pytest (>=7.0)", "pytes
 trio = ["trio (>=0.16,<0.22)"]
 
 [[package]]
+name = "astropy"
+version = "5.3"
+description = "Astronomy and astrophysics core library"
+category = "main"
+optional = false
+python-versions = ">=3.9"
+
+[package.dependencies]
+numpy = ">=1.21"
+packaging = ">=19.0"
+pyerfa = ">=2.0"
+PyYAML = ">=3.13"
+
+[package.extras]
+all = ["scipy (>=1.5)", "matplotlib (>=3.3,!=3.4.0,!=3.5.2)", "certifi", "dask", "h5py", "pyarrow (>=5.0.0)", "beautifulsoup4", "html5lib", "bleach", "pandas", "sortedcontainers", "pytz", "jplephem", "mpmath", "asdf (>=2.10.0)", "bottleneck", "ipython (>=4.2)", "pytest (>=7.0)", "typing-extensions (>=3.10.0.1)", "fsspec[http] (>=2022.8.2)", "s3fs (>=2022.8.2)", "pre-commit"]
+docs = ["sphinx", "sphinx-astropy (>=1.6)", "pytest (>=7.0)", "scipy (>=1.3)", "matplotlib (>=3.3,!=3.4.0,!=3.5.2)", "sphinx-changelog (>=1.2.0)", "Jinja2 (>=3.0)"]
+recommended = ["scipy (>=1.5)", "matplotlib (>=3.3,!=3.4.0,!=3.5.2)"]
+test = ["pytest (>=7.0)", "pytest-doctestplus (>=0.12)", "pytest-astropy-header (>=0.2.1)", "pytest-astropy (>=0.10)", "pytest-xdist"]
+test_all = ["pytest (>=7.0)", "pytest-doctestplus (>=0.12)", "pytest-astropy-header (>=0.2.1)", "pytest-astropy (>=0.10)", "pytest-xdist", "objgraph", "ipython (>=4.2)", "coverage", "skyfield (>=1.20)", "sgp4 (>=2.3)", "timezonefinder"]
+
+[[package]]
 name = "atomicwrites"
 version = "1.4.1"
 description = "Atomic file writes."
@@ -54,9 +75,6 @@ category = "dev"
 optional = false
 python-versions = ">=3.7"
 
-[package.dependencies]
-pytz = {version = ">=2015.7", markers = "python_version < \"3.9\""}
-
 [[package]]
 name = "black"
 version = "23.3.0"
@@ -79,6 +97,14 @@ colorama = ["colorama (>=0.4.3)"]
 d = ["aiohttp (>=3.7.4)"]
 jupyter = ["ipython (>=7.8.0)", "tokenize-rt (>=3.2.0)"]
 uvloop = ["uvloop (>=0.15.2)"]
+
+[[package]]
+name = "blosc"
+version = "1.11.1"
+description = "Blosc data compressor"
+category = "main"
+optional = false
+python-versions = ">=3.8"
 
 [[package]]
 name = "certifi"
@@ -483,6 +509,21 @@ dotenv = ["python-dotenv (>=0.10.4)"]
 email = ["email-validator (>=1.0.3)"]
 
 [[package]]
+name = "pyerfa"
+version = "2.0.0.3"
+description = "Python bindings for ERFA"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+numpy = ">=1.17"
+
+[package.extras]
+docs = ["sphinx-astropy (>=1.3)"]
+test = ["pytest", "pytest-doctestplus (>=0.7)"]
+
+[[package]]
 name = "pyflakes"
 version = "2.4.0"
 description = "passive checker of Python programs"
@@ -534,18 +575,10 @@ python-versions = "*"
 cli = ["click (>=5.0)"]
 
 [[package]]
-name = "pytz"
-version = "2023.3"
-description = "World timezone definitions, modern and historical"
-category = "dev"
-optional = false
-python-versions = "*"
-
-[[package]]
 name = "pyyaml"
 version = "6.0"
 description = "YAML parser and emitter for Python"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 
@@ -578,7 +611,6 @@ python-versions = ">=3.7.0"
 [package.dependencies]
 markdown-it-py = ">=2.2.0,<3.0.0"
 pygments = ">=2.13.0,<3.0.0"
-typing-extensions = {version = ">=4.0.0,<5.0", markers = "python_version < \"3.9\""}
 
 [package.extras]
 jupyter = ["ipywidgets (>=7.5.1,<9)"]
@@ -816,16 +848,18 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "flake8 (<5)", "pytest-co
 
 [metadata]
 lock-version = "1.1"
-python-versions = "^3.8"
-content-hash = "7c9245d214a4f6b5afa34444d262f87b0b1b5ca42cae10119581b25a870ed8cf"
+python-versions = ">=3.9,<4.0"
+content-hash = "85173e3fb2547224ddd5d17decb215b60e0b70d0ab7a578a422e34d3bcc092e8"
 
 [metadata.files]
 alabaster = []
 anyio = []
+astropy = []
 atomicwrites = []
 attrs = []
 babel = []
 black = []
+blosc = []
 certifi = []
 cfgv = [
     {file = "cfgv-3.3.1-py2.py3-none-any.whl", hash = "sha256:c6a0883f3917a037485059700b9e75da2464e6c27051014ad85ba6aaa5884426"},
@@ -936,6 +970,7 @@ pycodestyle = [
     {file = "pycodestyle-2.8.0.tar.gz", hash = "sha256:eddd5847ef438ea1c7870ca7eb78a9d47ce0cdb4851a5523949f2601d0cbbe7f"},
 ]
 pydantic = []
+pyerfa = []
 pyflakes = [
     {file = "pyflakes-2.4.0-py2.py3-none-any.whl", hash = "sha256:3bb3a3f256f4b7968c9c788781e4ff07dce46bdf12339dcda61053375426ee2e"},
     {file = "pyflakes-2.4.0.tar.gz", hash = "sha256:05a85c2872edf37a4ed30b0cce2f6093e1d0581f8c19d7393122da7e25b2b24c"},
@@ -949,7 +984,6 @@ python-dotenv = [
     {file = "python-dotenv-0.18.0.tar.gz", hash = "sha256:effaac3c1e58d89b3ccb4d04a40dc7ad6e0275fda25fd75ae9d323e2465e202d"},
     {file = "python_dotenv-0.18.0-py2.py3-none-any.whl", hash = "sha256:dd8fe852847f4fbfadabf6183ddd4c824a9651f02d51714fa075c95561959c7d"},
 ]
-pytz = []
 pyyaml = [
     {file = "PyYAML-6.0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:d4db7c7aef085872ef65a8fd7d6d09a14ae91f691dec3e87ee5ee0539d516f53"},
     {file = "PyYAML-6.0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:9df7ed3b3d2e0ecfe09e14741b857df43adb5a3ddadc919a2d94fbdf78fea53c"},
