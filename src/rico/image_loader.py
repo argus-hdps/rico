@@ -10,7 +10,7 @@ from . import config, models
 class EVRImageLoader:
     """Class for loading EVRImage data into a MongoDB collection."""
 
-    def __init__(self) -> None:
+    def __init__(self, create_client: bool = True) -> None:
         """
         Initialize EVRImageLoader.
 
@@ -20,9 +20,10 @@ class EVRImageLoader:
         Returns:
             None
         """
-        self.client: MongoClient[Dict[str, Any]] = MongoClient(
-            config.MONGODB_URI, uuidRepresentation="standard"
-        )
+        self.client: MongoClient[Dict[str, Any]]
+
+        if create_client:
+            self.client = MongoClient(config.MONGODB_URI, uuidRepresentation="standard")
 
     def load_fits(self, path: str) -> None:
         """
@@ -56,6 +57,8 @@ class EVRImageLoader:
         Returns:
             None
         """
+        if self.client is None:
+            self.client = MongoClient(config.MONGODB_URI, uuidRepresentation="standard")
         images = glob.glob(os.path.join(dirname, "*.fits"))
 
         for image in images:

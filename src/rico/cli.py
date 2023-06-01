@@ -44,13 +44,11 @@ def index_images(cli_config: Config, directories: Sequence[str]) -> None:
         directories: Iterable of directories containing EVR images.
 
     """
-    print(directories)
-    return
     import multiprocessing as mp
 
     from . import EVRImageLoader
 
-    image_loader = EVRImageLoader()
+    image_loader = EVRImageLoader(create_client=False)
 
     pool = mp.Pool(cli_config.ncpus)
 
@@ -58,7 +56,7 @@ def index_images(cli_config: Config, directories: Sequence[str]) -> None:
     out = []
     with click.progressbar(
         pool.imap_unordered(image_loader.load_directory, directories),
-        label="Injecting: ",
+        label="Loading: ",
         length=n_directories,
     ) as pbar:
         for _ in pbar:
