@@ -65,7 +65,7 @@ class EVRImage(BaseModel):
     camera: Optional[str] = Field(...)
     filter_name: str = Field(...)
     obstime: datetime.datetime = Field(...)
-    gpstime: Optional[datetime.datetime] = Field(...)
+    gpstime: Optional[datetime.datetime] = None
     ccd_set_temp: float = Field(...)
     ccd_temp: float = Field(...)
     exp_time: float = Field(...)
