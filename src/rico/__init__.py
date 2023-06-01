@@ -4,7 +4,7 @@ __author__ = """Hank Corbett"""
 __email__ = "htc@unc.edu"
 __version__ = "0.1.0"
 
-__all__ = ["RicoHeartBeat", "RawStreamer"]
+__all__ = ["RicoHeartBeat", "RawStreamer", "EVRImageLoader"]
 
 import logging
 import os
@@ -77,4 +77,5 @@ get_logger(__name__).addHandler(logging.StreamHandler())
 
 
 from .heartbeat import RicoHeartBeat  # noqa: E402
+from .image_loader import EVRImageLoader  # noqa: E402
 from .raw_streamer import RawStreamer  # noqa: E402
