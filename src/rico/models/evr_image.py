@@ -124,7 +124,8 @@ class EVRImage(BaseModel):
         constructor_dict["camera"] = header["CCDDETID"]
         constructor_dict["filter_name"] = header["FILTER"]
         constructor_dict["obstime"] = header["DATE-OBS"] + "T" + header["TIME-OBS"]
-        constructor_dict["gpstime"] = header["GPSTIME"]
+        if "GPSTIME" in header:
+            constructor_dict["gpstime"] = header["GPSTIME"]
         constructor_dict["ccd_set_temp"] = header["SETTEMP"]
         constructor_dict["ccd_temp"] = header["CCDTEMP"]
         constructor_dict["exp_time"] = header["EXPTIME"]
@@ -216,7 +217,8 @@ class EVRImageUpdate(BaseModel):
         constructor_dict["camera"] = header["CCDDETID"]
         constructor_dict["filter_name"] = header["FILTER"]
         constructor_dict["obstime"] = header["DATE-OBS"] + "T" + header["TIME-OBS"]
-        constructor_dict["gpstime"] = header["GPSTIME"]
+        if "GPSTIME" in header:
+            constructor_dict["gpstime"] = header["GPSTIME"]
         constructor_dict["ccd_set_temp"] = header["SETTEMP"]
         constructor_dict["ccd_temp"] = header["CCDTEMP"]
         constructor_dict["exp_time"] = header["EXPTIME"]
