@@ -1,8 +1,9 @@
 import datetime
 import os
+import socket
 import uuid
 import warnings
-from typing import Any, Dict, Optional, Type, TypeVar
+from typing import Any, Dict, Optional, Type, TypeVar, Union
 
 import astropy.io.fits as fits
 import astropy.wcs as awcs
@@ -15,9 +16,11 @@ warnings.simplefilter("ignore", category=awcs.FITSFixedWarning)
 
 
 Q = qlsc.QLSC(depth=30)
+HOSTNAME = socket.gethostname()
 
-EI = TypeVar("EI", bound="EVRImage")
-EIU = TypeVar("EIU", bound="EVRImageUpdate")
+
+EVRImageType = TypeVar("EVRImageType", bound="EVRImage")
+EVRImageUpdateType = TypeVar("EVRImageUpdateType", bound="EVRImageUpdate")
 
 
 def _wcs_to_footprint(header: fits.Header) -> Dict[str, Any]:
@@ -58,6 +61,69 @@ def _wcs_to_footprint(header: fits.Header) -> Dict[str, Any]:
     return footprint
 
 
+def fitspath_to_constructor(fitspath: Union[str, fits.HDUList]) -> Dict[str, Any]:
+    """
+    Convert a FITS header into a Pydantic constructor dictionary.
+
+    Args:
+        fitspath (str or astropy.io.fits.HDUList): The path to the FITS file or
+        and HDUList object.
+
+    Returns:
+        Dict[str, Any]: The Pydantic constructor dictionary representing the FITS header.
+
+    Raises:
+        KeyError: If any required FITS header fields are missing.
+    """
+    if type(fitspath) is str:
+        hdulist = fits.open(fitspath)
+
+    if len(hdulist) == 1:
+        hdu_num = 0
+    else:
+        hdu_num = 1
+    header = hdulist[hdu_num].header.copy()
+    hdulist.close()
+
+    if "FIELDID" not in header:
+        header["FIELDID"] = 400
+
+    constructor_dict = {}
+    constructor_dict["camera"] = header["CCDDETID"]
+    constructor_dict["filter_name"] = header["FILTER"]
+    constructor_dict["obstime"] = header["DATE-OBS"] + "T" + header["TIME-OBS"]
+    if "GPSTIME" in header and "Z" in header["GPSTIME"]:
+        constructor_dict["gpstime"] = header["GPSTIME"]
+    constructor_dict["ccd_set_temp"] = header["SETTEMP"]
+    constructor_dict["ccd_temp"] = header["CCDTEMP"]
+    constructor_dict["exp_time"] = header["EXPTIME"]
+    constructor_dict["site_name"] = header["TELOBS"]
+    constructor_dict["server_name"] = HOSTNAME
+    constructor_dict["basename"] = header["ORIGNAME"].split(".")[0]
+    constructor_dict["fieldid"] = header["FIELDID"]
+    constructor_dict["ratchnum"] = header["RATCHNUM"]
+    constructor_dict["mount_ha"] = header["MOUNTHA"]
+    constructor_dict["sha1"] = header["CHECKSUM"]
+    constructor_dict["ccd_ext_temp"] = header["CCDETEMP"]
+    constructor_dict["wind_dir"] = header["WINDDIR"]
+    constructor_dict["wind_speed"] = header["WINDSPED"]
+    constructor_dict["rel_humidity"] = header["OUTRELHU"]
+    constructor_dict["dew_point"] = header["OUTDEWPT"]
+    constructor_dict["air_pressure"] = header["OUTPRESS"]
+    constructor_dict["mushroom_temp"] = header["INR1TEMP"]
+    constructor_dict["inc_x"] = header["INR1INCX"]
+    constructor_dict["inc_y"] = header["INR1INCY"]
+    constructor_dict["inc_z"] = header["INR1INCZ"]
+
+    if "CRVAL1" in header:
+        constructor_dict["qid"] = Q.ang2ipix(header["CRVAL1"], header["CRVAL2"])
+        constructor_dict["footprint"] = Polygon(**_wcs_to_footprint(header))
+        constructor_dict["wcspath"] = os.path.abspath(fitspath)
+    else:
+        constructor_dict["rawpath"] = os.path.abspath(fitspath)
+    return constructor_dict
+
+
 class EVRImage(BaseModel):
     """Class representing an EVR image."""
 
@@ -71,6 +137,7 @@ class EVRImage(BaseModel):
     exp_time: float = Field(...)
 
     site_name: str = Field(...)
+    server_name: str = Field(...)
     rawpath: Optional[str] = None
     wcspath: Optional[str] = None
     basename: str = Field(...)
@@ -98,7 +165,7 @@ class EVRImage(BaseModel):
         allow_population_by_field_name = True
 
     @classmethod
-    def from_fits(cls: Type[EI], fitspath: str) -> EI:
+    def from_fits(cls: Type[EVRImageType], fitspath: str) -> EVRImageType:
         """Create an instance of EVRImage from a FITS file.
 
         Args:
@@ -109,50 +176,9 @@ class EVRImage(BaseModel):
 
         """
 
-        hdulist = fits.open(fitspath)
-        if len(hdulist) == 1:
-            hdu_num = 0
-        else:
-            hdu_num = 1
-        header = hdulist[hdu_num].header.copy()
-        hdulist.close()
+        constructor_dict = fitspath_to_constructor(fitspath)
 
-        if "FIELDID" not in header:
-            header["FIELDID"] = 400
-
-        constructor_dict = {}
-        constructor_dict["camera"] = header["CCDDETID"]
-        constructor_dict["filter_name"] = header["FILTER"]
-        constructor_dict["obstime"] = header["DATE-OBS"] + "T" + header["TIME-OBS"]
-        if "GPSTIME" in header and "Z" in header["GPSTIME"]:
-            constructor_dict["gpstime"] = header["GPSTIME"]
-        constructor_dict["ccd_set_temp"] = header["SETTEMP"]
-        constructor_dict["ccd_temp"] = header["CCDTEMP"]
-        constructor_dict["exp_time"] = header["EXPTIME"]
-        constructor_dict["site_name"] = header["TELOBS"]
-        constructor_dict["basename"] = header["ORIGNAME"].split(".")[0]
-        constructor_dict["fieldid"] = header["FIELDID"]
-        constructor_dict["ratchnum"] = header["RATCHNUM"]
-        constructor_dict["mount_ha"] = header["MOUNTHA"]
-        constructor_dict["sha1"] = header["CHECKSUM"]
-        constructor_dict["ccd_ext_temp"] = header["CCDETEMP"]
-        constructor_dict["wind_dir"] = header["WINDDIR"]
-        constructor_dict["wind_speed"] = header["WINDSPED"]
-        constructor_dict["rel_humidity"] = header["OUTRELHU"]
-        constructor_dict["dew_point"] = header["OUTDEWPT"]
-        constructor_dict["air_pressure"] = header["OUTPRESS"]
-        constructor_dict["mushroom_temp"] = header["INR1TEMP"]
-        constructor_dict["inc_x"] = header["INR1INCX"]
-        constructor_dict["inc_y"] = header["INR1INCY"]
-        constructor_dict["inc_z"] = header["INR1INCZ"]
-
-        if "CRVAL1" in header:
-            constructor_dict["qid"] = Q.ang2ipix(header["CRVAL1"], header["CRVAL2"])
-            constructor_dict["footprint"] = Polygon(**_wcs_to_footprint(header))
-            constructor_dict["wcspath"] = os.path.abspath(fitspath)
-        else:
-            constructor_dict["rawpath"] = os.path.abspath(fitspath)
-
+        # This is duplicated boiler plate between the Image/ImageUpdate classes
         try:
             inst = cls(**constructor_dict)
         except ValidationError as e:
@@ -175,6 +201,7 @@ class EVRImageUpdate(BaseModel):
     ccd_temp: Optional[float]
     exp_time: Optional[float]
     site_name: Optional[str]
+    server_name: Optional[str]
     rawpath: Optional[str]
     wcspath: Optional[str]
     basename: Optional[str]
@@ -200,7 +227,7 @@ class EVRImageUpdate(BaseModel):
         allow_population_by_field_name = True
 
     @classmethod
-    def from_fits(cls: Type[EIU], fitspath: str) -> EIU:
+    def from_fits(cls: Type[EVRImageUpdateType], fitspath: str) -> EVRImageUpdateType:
         """Create an instance of EVRImageUpdate from a FITS file.
 
         Args:
@@ -210,50 +237,9 @@ class EVRImageUpdate(BaseModel):
             An instance of EVRImageUpdate.
 
         """
-        hdulist = fits.open(fitspath)
-        if len(hdulist) == 1:
-            hdu_num = 0
-        else:
-            hdu_num = 1
-        header = hdulist[hdu_num].header.copy()
-        hdulist.close()
+        constructor_dict = fitspath_to_constructor(fitspath)
 
-        if "FIELDID" not in header:
-            header["FIELDID"] = 400
-
-        constructor_dict = {}
-        constructor_dict["camera"] = header["CCDDETID"]
-        constructor_dict["filter_name"] = header["FILTER"]
-        constructor_dict["obstime"] = header["DATE-OBS"] + "T" + header["TIME-OBS"]
-        if "GPSTIME" in header:
-            constructor_dict["gpstime"] = header["GPSTIME"]
-        constructor_dict["ccd_set_temp"] = header["SETTEMP"]
-        constructor_dict["ccd_temp"] = header["CCDTEMP"]
-        constructor_dict["exp_time"] = header["EXPTIME"]
-        constructor_dict["site_name"] = header["TELOBS"]
-        constructor_dict["basename"] = header["ORIGNAME"].split(".")[0]
-        constructor_dict["fieldid"] = header["FIELDID"]
-        constructor_dict["ratchnum"] = header["RATCHNUM"]
-        constructor_dict["mount_ha"] = header["MOUNTHA"]
-        constructor_dict["sha1"] = header["CHECKSUM"]
-        constructor_dict["ccd_ext_temp"] = header["CCDETEMP"]
-        constructor_dict["wind_dir"] = header["WINDDIR"]
-        constructor_dict["wind_speed"] = header["WINDSPED"]
-        constructor_dict["rel_humidity"] = header["OUTRELHU"]
-        constructor_dict["dew_point"] = header["OUTDEWPT"]
-        constructor_dict["air_pressure"] = header["OUTPRESS"]
-        constructor_dict["mushroom_temp"] = header["INR1TEMP"]
-        constructor_dict["inc_x"] = header["INR1INCX"]
-        constructor_dict["inc_y"] = header["INR1INCY"]
-        constructor_dict["inc_z"] = header["INR1INCZ"]
-
-        if "CRVAL1" in header:
-            constructor_dict["qid"] = Q.ang2ipix(header["CRVAL1"], header["CRVAL2"])
-            constructor_dict["footprint"] = Polygon(**_wcs_to_footprint(header))
-            constructor_dict["wcspath"] = os.path.abspath(fitspath)
-        else:
-            constructor_dict["rawpath"] = os.path.abspath(fitspath)
-
+        # This is duplicated boiler plate between the Image/ImageUpdate classes
         try:
             inst = cls(**constructor_dict)
         except ValidationError as e:
