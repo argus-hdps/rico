@@ -9,7 +9,7 @@ import astropy.wcs as awcs
 import numpy as np
 import qlsc
 from geojson_pydantic import Polygon
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 
 warnings.simplefilter("ignore", category=awcs.FITSFixedWarning)
 
@@ -76,7 +76,7 @@ class EVRImage(BaseModel):
     basename: str = Field(...)
     fieldid: float = Field(...)
     ratchnum: str = Field(...)
-    mount_ha: float = Field(...)
+    mount_ha: Optional[float] = Field(...)
     sha1: str = Field(...)
     ccd_ext_temp: float = Field(...)
     wind_dir: float = Field(...)
@@ -85,9 +85,9 @@ class EVRImage(BaseModel):
     dew_point: float = Field(...)
     air_pressure: float = Field(...)
     mushroom_temp: float = Field(...)
-    inc_x: float = Field(...)
-    inc_y: float = Field(...)
-    inc_z: float = Field(...)
+    inc_x: Optional[float] = Field(...)
+    inc_y: Optional[float] = Field(...)
+    inc_z: Optional[float] = Field(...)
 
     footprint: Optional[Polygon] = Field(...)
     qid: Optional[int] = Field(...)
@@ -96,6 +96,17 @@ class EVRImage(BaseModel):
         """Pydantic configuration."""
 
         allow_population_by_field_name = True
+
+    @validator("inc_x", pre=True)
+    @validator("inc_y", pre=True)
+    @validator("inc_z", pre=True)
+    @validator("mount_ha", pre=True)
+    @validator("mushroom_temp", pre=True)
+    def float_or_none(cls: Type[EI], v: Any):
+        try:
+            return float(v)
+        except ValueError:
+            return None
 
     @classmethod
     def from_fits(cls: Type[EI], fitspath: str) -> EI:
@@ -190,6 +201,17 @@ class EVRImageUpdate(BaseModel):
         """Pydantic configuration."""
 
         allow_population_by_field_name = True
+
+    @validator("inc_x", pre=True)
+    @validator("inc_y", pre=True)
+    @validator("inc_z", pre=True)
+    @validator("mount_ha", pre=True)
+    @validator("mushroom_temp", pre=True)
+    def float_or_none(cls: Type[EIU], v: Any) -> Optional[float]:
+        try:
+            return float(v)
+        except ValueError:
+            return None
 
     @classmethod
     def from_fits(cls: Type[EIU], fitspath: str) -> EIU:

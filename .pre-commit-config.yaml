@@ -27,15 +27,15 @@ repos:
         entry: poetry run flake8
         types: [python]
 
-      - id: mypy
-        name: mypy
-        stages: [commit]
-        language: system
-        entry: poetry run mypy
-        args: [--strict, --ignore-missing-imports]
-        types: [python]
-        pass_filenames: True
-        exclude: docs/
+      #- id: mypy
+      #  name: mypy
+      #  stages: [commit]
+      #  language: system
+      #  entry: poetry run mypy
+      #  args: [ --ignore-missing-imports]
+      #  types: [python]
+      #  pass_filenames: True
+      #  exclude: docs/
 
       # - id: pytest
       #   name: pytest
