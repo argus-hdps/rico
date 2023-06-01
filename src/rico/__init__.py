@@ -36,6 +36,7 @@ class Config(object):
     KAFKA_PORT = os.environ.get("KAFKA_PORT") or "9092"
     HBEAT_TOPIC = os.environ.get("HBEAT_TOPIC") or "rico.heartbeat"
     RAW_TOPIC_BASE = os.environ.get("RAW_TOPIC_BASE") or "rico.candidates.raw"
+    EVR_IMAGE_TOPIC = os.environ.get("RAW_TOPIC_BASE") or "rico.images.evr"
 
     MONGODB_URI = os.environ.get("MONGODB_URI") or None
     MONGO_DBNAME = os.environ.get("MONGO_DBNAME") or "hdps"

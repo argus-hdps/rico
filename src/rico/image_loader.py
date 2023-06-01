@@ -1,10 +1,58 @@
 import glob
 import os
-from typing import Any, Dict
+from typing import Any, Dict, Union
 
+import astropy.io.fits as fits
 from pymongo import MongoClient
 
 from . import config, models
+from .models import fitspath_to_constructor
+from .producer import Producer
+
+
+class EVRImageProducer(Producer):
+    """
+    A Kafka producer for sending EVR images.
+
+    Args:
+        None
+
+    Attributes:
+        host (str): The Kafka host address.
+        port (int): The Kafka port number.
+
+    """
+
+    def __init__(self) -> None:
+        """
+        Initialize the EVRImageProducer.
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        """
+        super().__init__(
+            host=config.KAFKA_ADDR,
+            port=config.KAFKA_PORT,
+        )
+
+    def send_image(self, image: Union[str, fits.HDUList]) -> None:
+        """
+        Send an image to the EVR image topic.
+
+        Args:
+            image (Union[str, fits.HDUList]): The image to be sent. It can be either a string representing the
+                path to a FITS file or a `fits.HDUList` object.
+
+        Returns:
+            None
+
+        """
+        image_dict = fitspath_to_constructor(image)
+        self.send_json(image_dict, config.EVR_IMAGE_TOPIC)
 
 
 class EVRImageLoader:
@@ -15,7 +63,7 @@ class EVRImageLoader:
         Initialize EVRImageLoader.
 
         Args:
-            None
+            create_client (bool): Whether to create a MongoDB client. Default is True.
 
         Returns:
             None
