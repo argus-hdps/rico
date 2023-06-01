@@ -18,6 +18,10 @@ orjson = "^3.8.13"
 slack-bolt = "^1.18.0"
 blosc = "^1.11.1"
 astropy = "^5.3"
+pymongo = "^4.3.3"
+pydantic = "^1.10.8"
+geojson-pydantic = "^0.6.2"
+qlsc = "^1.0.6"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2"
