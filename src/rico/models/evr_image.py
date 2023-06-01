@@ -97,11 +97,11 @@ class EVRImage(BaseModel):
 
         allow_population_by_field_name = True
 
-    @validator("inc_x", pre=True)
-    @validator("inc_y", pre=True)
-    @validator("inc_z", pre=True)
-    @validator("mount_ha", pre=True)
-    @validator("mushroom_temp", pre=True)
+    @validator("inc_x", pre=True, allow_reuse=True)
+    @validator("inc_y", pre=True, allow_reuse=True)
+    @validator("inc_z", pre=True, allow_reuse=True)
+    @validator("mount_ha", pre=True, allow_reuse=True)
+    @validator("mushroom_temp", pre=True, allow_reuse=True)
     def float_or_none(cls: Type[EI], v: Any):
         try:
             return float(v)
@@ -202,11 +202,11 @@ class EVRImageUpdate(BaseModel):
 
         allow_population_by_field_name = True
 
-    @validator("inc_x", pre=True)
-    @validator("inc_y", pre=True)
-    @validator("inc_z", pre=True)
-    @validator("mount_ha", pre=True)
-    @validator("mushroom_temp", pre=True)
+    @validator("inc_x", pre=True, allow_reuse=True)
+    @validator("inc_y", pre=True, allow_reuse=True)
+    @validator("inc_z", pre=True, allow_reuse=True)
+    @validator("mount_ha", pre=True, allow_reuse=True)
+    @validator("mushroom_temp", pre=True, allow_reuse=True)
     def float_or_none(cls: Type[EIU], v: Any) -> Optional[float]:
         try:
             return float(v)
