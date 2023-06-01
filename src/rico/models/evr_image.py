@@ -9,7 +9,7 @@ import astropy.wcs as awcs
 import numpy as np
 import qlsc
 from geojson_pydantic import Polygon
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, ValidationError
 
 warnings.simplefilter("ignore", category=awcs.FITSFixedWarning)
 
@@ -97,17 +97,6 @@ class EVRImage(BaseModel):
 
         allow_population_by_field_name = True
 
-    @validator("inc_x", pre=True, allow_reuse=True)
-    @validator("inc_y", pre=True, allow_reuse=True)
-    @validator("inc_z", pre=True, allow_reuse=True)
-    @validator("mount_ha", pre=True, allow_reuse=True)
-    @validator("mushroom_temp", pre=True, allow_reuse=True)
-    def float_or_none(cls: Type[EI], v: Any):
-        try:
-            return float(v)
-        except ValueError:
-            return None
-
     @classmethod
     def from_fits(cls: Type[EI], fitspath: str) -> EI:
         """Create an instance of EVRImage from a FITS file.
@@ -164,7 +153,15 @@ class EVRImage(BaseModel):
         else:
             constructor_dict["rawpath"] = os.path.abspath(fitspath)
 
-        return cls(**constructor_dict)
+        try:
+            inst = cls(**constructor_dict)
+        except ValidationError as e:
+            for error in e.errors():
+                field = error["loc"][0]
+                constructor_dict[field] = None
+            inst = cls(**constructor_dict)
+
+        return inst
 
 
 class EVRImageUpdate(BaseModel):
@@ -201,17 +198,6 @@ class EVRImageUpdate(BaseModel):
         """Pydantic configuration."""
 
         allow_population_by_field_name = True
-
-    @validator("inc_x", pre=True, allow_reuse=True)
-    @validator("inc_y", pre=True, allow_reuse=True)
-    @validator("inc_z", pre=True, allow_reuse=True)
-    @validator("mount_ha", pre=True, allow_reuse=True)
-    @validator("mushroom_temp", pre=True, allow_reuse=True)
-    def float_or_none(cls: Type[EIU], v: Any) -> Optional[float]:
-        try:
-            return float(v)
-        except ValueError:
-            return None
 
     @classmethod
     def from_fits(cls: Type[EIU], fitspath: str) -> EIU:
@@ -268,4 +254,12 @@ class EVRImageUpdate(BaseModel):
         else:
             constructor_dict["rawpath"] = os.path.abspath(fitspath)
 
-        return cls(**constructor_dict)
+        try:
+            inst = cls(**constructor_dict)
+        except ValidationError as e:
+            for error in e.errors():
+                field = error["loc"][0]
+                constructor_dict[field] = None
+            inst = cls(**constructor_dict)
+
+        return inst
