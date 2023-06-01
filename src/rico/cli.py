@@ -52,6 +52,7 @@ def index_images(cli_config: Config, directories: Sequence[str]) -> None:
 
     pool = mp.Pool(cli_config.ncpus)
 
+    directories = sorted(directories)
     n_directories = len(directories)
     out = []
     with click.progressbar(
