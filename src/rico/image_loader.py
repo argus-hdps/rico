@@ -21,6 +21,7 @@ class EVRImageLoader:
             None
         """
         self.client: MongoClient[Dict[str, Any]]
+        self.client_loaded: bool = create_client
 
         if create_client:
             self.client = MongoClient(config.MONGODB_URI, uuidRepresentation="standard")
@@ -57,7 +58,7 @@ class EVRImageLoader:
         Returns:
             None
         """
-        if self.client is None:
+        if not self.client_loaded:
             self.client = MongoClient(config.MONGODB_URI, uuidRepresentation="standard")
         images = glob.glob(os.path.join(dirname, "*.fits"))
 
