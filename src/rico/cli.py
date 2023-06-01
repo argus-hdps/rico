@@ -44,6 +44,8 @@ def index_images(cli_config: Config, directories: Sequence[str]) -> None:
         directories: Iterable of directories containing EVR images.
 
     """
+    print(directories)
+    return
     import multiprocessing as mp
 
     from . import EVRImageLoader
