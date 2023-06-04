@@ -91,7 +91,7 @@ def fitspath_to_constructor(fitspath: Union[str, fits.HDUList]) -> Dict[str, Any
     constructor_dict = {}
     constructor_dict["camera"] = header["CCDDETID"]
     constructor_dict["filter_name"] = header["FILTER"]
-    constructor_dict["image_type"] = header["IMGTYPE"]
+    constructor_dict["image_type"] = header["IMGTYPE"].strip()
     constructor_dict["obstime"] = header["DATE-OBS"] + "T" + header["TIME-OBS"]
     if "GPSTIME" in header and "Z" in header["GPSTIME"]:
         constructor_dict["gpstime"] = header["GPSTIME"]
