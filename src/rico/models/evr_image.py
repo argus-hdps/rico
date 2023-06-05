@@ -139,6 +139,7 @@ class EVRImage(BaseModel):
 
     site_name: str = Field(...)
     server_name: str = Field(...)
+    image_type: str = Field(...)
     rawpath: Optional[str] = None
     wcspath: Optional[str] = None
     basename: str = Field(...)
@@ -203,6 +204,7 @@ class EVRImageUpdate(BaseModel):
     exp_time: Optional[float]
     site_name: Optional[str]
     server_name: Optional[str]
+    image_type: Optional[str]
     rawpath: Optional[str]
     wcspath: Optional[str]
     basename: Optional[str]
