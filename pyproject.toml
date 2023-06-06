@@ -22,6 +22,7 @@ pymongo = "^4.3.3"
 pydantic = "^1.10.8"
 geojson-pydantic = "^0.6.2"
 numpy = "^1.24.3"
+ipython = "^8.14.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2"

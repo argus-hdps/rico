@@ -15,7 +15,7 @@ class Config(object):
 
     def __init__(self) -> None:
         self.verbose = False
-        self.ncpus = 36
+        self.ncpus = 72
 
 
 pass_config = click.make_pass_decorator(Config, ensure=True)
