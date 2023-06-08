@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "rico"
-version = "0.1.0"
-description = "Transient alert generation for Argus and Evryscope"
+name = "argus-rico"
+version = "0.0.1"
+description = "Transient alert generation and database interaction for Argus and Evryscope"
 authors = ["Hank Corbett"]
 
 [tool.poetry.dependencies]
