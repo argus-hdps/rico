@@ -76,7 +76,7 @@ def get_image_meta(
 
     client = MongoClient(config.MONGODB_URI)
     collection = client[config.MONGO_DBNAME].evr_images
-    image = collection.findOne({"basename": basename})
+    image = collection.find_one({"basename": basename})
     return image
 
 

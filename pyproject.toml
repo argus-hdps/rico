@@ -27,6 +27,8 @@ sanitize-filename = "^1.2.0"
 # efte = { git = "git@github.com:corbettht/efte.git", branch = "master", optional=true}
 # hera = { git = "git@github.com:argus-hdps/hera.git", branch = "main", optional=true}
 pymongoarrow = "^0.7.0"
+pandas = "^2.0.2"
+qlsc = "^1.0.6"
 
 
 [tool.poetry.dev-dependencies]
