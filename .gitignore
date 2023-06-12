@@ -106,4 +106,8 @@ ENV/
 # OS indexing
 *.DS_Store
 
+<<<<<<< HEAD
 poetry.lock
+=======
+poetry.lock
+>>>>>>> d33d6ba4c1000d4eca4908762feb8b45c9154890
