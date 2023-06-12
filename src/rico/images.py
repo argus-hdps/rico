@@ -58,6 +58,28 @@ def images_containing(
     return images
 
 
+def get_image_meta(
+    path: str,
+) -> Dict[str, Any]:
+    """
+    Retrieve image metadata by filename.
+
+    Args:
+        path (str): Filename for the image
+
+    Returns:
+        Dict: Dictionary of image metadata
+
+    """
+
+    basename = os.path.basename(path).split(".")[0]
+
+    client = MongoClient(config.MONGODB_URI)
+    collection = client[config.MONGO_DBNAME].evr_images
+    image = collection.findOne({"basename": basename})
+    return image
+
+
 class EVRImageProducer(Producer):
     """
     A Kafka producer for sending EVR images.
