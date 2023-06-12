@@ -1,13 +1,61 @@
+import datetime
 import glob
 import os
 from typing import Any, Dict, Union
 
 import astropy.io.fits as fits
+import pandas as pd
+import pymongoarrow.monkey
 from pymongo import MongoClient
+from pymongoarrow.api import Schema
 
 from . import config, models
 from .models import fitspath_to_constructor
 from .producer import Producer
+
+pymongoarrow.monkey.patch_all()
+
+
+def images_containing(
+    ra: float, dec: float, date_start: datetime.datetime, date_end: datetime.datetime
+) -> pd.DataFrame:
+    """
+    Retrieve images containing a given position within a specified time range.
+
+    Args:
+        ra (float): Right ascension (ICRS) of the target position.
+        dec (float): Declination (ICRS) of the target position.
+        date_start (datetime.datetime): Start date of the time range.
+        date_end (datetime.datetime): End date of the time range.
+
+    Returns:
+        pd.DataFrame: A DataFrame containing the retrieved images.
+
+    """
+    client = MongoClient(config.MONGODB_URI)
+    collection = client[config.MONGO_DBNAME].evr_images
+    images = collection.find_pandas_all(
+        {
+            "$and": [{"rawpath": {"$ne": None}}, {"wcspath": {"$ne": None}}],
+            "footprint": {
+                "$geoIntersects": {
+                    "$geometry": {"type": "Point", "coordinates": [ra - 180.0, dec]}
+                }
+            },
+            "obstime": {"$gte": date_start, "$lte": date_end},
+            "image_type": "object",
+        },
+        schema=Schema(
+            {
+                "obstime": datetime.datetime,
+                "image_type": str,
+                "camera": str,
+                "rawpath": str,
+                "wcspath": str,
+            }
+        ),
+    )
+    return images
 
 
 class EVRImageProducer(Producer):

@@ -78,5 +78,5 @@ get_logger(__name__).addHandler(logging.StreamHandler())
 
 
 from .heartbeat import RicoHeartBeat  # noqa: E402
-from .image_loader import EVRImageLoader  # noqa: E402
+from .images import EVRImageLoader  # noqa: E402
 from .raw_streamer import RawStreamer  # noqa: E402
