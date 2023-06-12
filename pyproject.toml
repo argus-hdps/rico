@@ -1,14 +1,14 @@
 [tool.poetry]
 name = "argus-rico"
-version = "0.0.1"
+version = "0.0.2"
 description = "Transient alert generation and database interaction for Argus and Evryscope"
 authors = ["Hank Corbett"]
 
 [tool.poetry.dependencies]
-python = ">=3.9,<4.0"
-python-dotenv = "^0.18.0"
+python = "^3.10,<3.11"
+python-dotenv = "^0.19.0"
 fastavro = "^1.4.12"
-pyarrow = "^8.0.0"
+pyarrow = ">=10.0.0"
 confluent-kafka = "^2.1.1"
 fastapi = "^0.95.2"
 rich = "^13.3.5"
@@ -23,6 +23,11 @@ pydantic = "^1.10.8"
 geojson-pydantic = "^0.6.2"
 numpy = "^1.24.3"
 ipython = "^8.14.0"
+sanitize-filename = "^1.2.0"
+efte = { git = "git@github.com:corbettht/efte.git", branch = "master", optional=true}
+hera = { git = "git@github.com:argus-hdps/hera.git", branch = "main", optional=true}
+pymongoarrow = "^0.7.0"
+
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2"
@@ -31,6 +36,10 @@ isort = "^5.10.1"
 flake8 = "^4.0.1"
 Sphinx = "^7.0.1"
 pre-commit = "^3.3.2"
+
+[tool.poetry.extras]
+efte = ["efte"]
+hera = ["hera"]
 
 
 [tool.poetry.scripts]

@@ -2,7 +2,7 @@
 
 __author__ = """Hank Corbett"""
 __email__ = "htc@unc.edu"
-__version__ = "0.1.0"
+__version__ = "0.0.2"
 
 __all__ = ["RicoHeartBeat", "RawStreamer", "EVRImageLoader"]
 
@@ -32,7 +32,7 @@ class Config(object):
 
     LOCAL_ADDR = os.environ.get("LOCAL_ADDR") or "127.0.0.1"
 
-    KAFKA_ADDR = os.environ.get("KAFKA_ADDR") or "152.2.38.172"
+    KAFKA_ADDR = os.environ.get("KAFKA_ADDR") or "127.0.0.1"
     KAFKA_PORT = os.environ.get("KAFKA_PORT") or "9092"
     HBEAT_TOPIC = os.environ.get("HBEAT_TOPIC") or "rico.heartbeat"
     RAW_TOPIC_BASE = os.environ.get("RAW_TOPIC_BASE") or "rico.candidates.raw"
@@ -78,5 +78,5 @@ get_logger(__name__).addHandler(logging.StreamHandler())
 
 
 from .heartbeat import RicoHeartBeat  # noqa: E402
-from .image_loader import EVRImageLoader  # noqa: E402
+from .images import EVRImageLoader  # noqa: E402
 from .raw_streamer import RawStreamer  # noqa: E402
