@@ -24,8 +24,6 @@ geojson-pydantic = "^0.6.2"
 numpy = "^1.24.3"
 ipython = "^8.14.0"
 sanitize-filename = "^1.2.0"
-# efte = { git = "git@github.com:corbettht/efte.git", branch = "master", optional=true}
-# hera = { git = "git@github.com:argus-hdps/hera.git", branch = "main", optional=true}
 pymongoarrow = "^0.7.0"
 pandas = "^2.0.2"
 qlsc = "^1.0.6"
@@ -38,11 +36,6 @@ isort = "^5.10.1"
 flake8 = "^4.0.1"
 Sphinx = "^7.0.1"
 pre-commit = "^3.3.2"
-
-[tool.poetry.extras]
-# efte = ["efte"]
-# hera = ["hera"]
-
 
 [tool.poetry.scripts]
 rico = "rico.cli:main"
