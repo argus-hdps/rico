@@ -38,7 +38,7 @@ Sphinx = "^7.0.1"
 pre-commit = "^3.3.2"
 
 [tool.poetry.scripts]
-rico = "rico.cli:main"
+rico = "argus_rico.cli:main"
 
 [tool.isort]
 profile = "black"
