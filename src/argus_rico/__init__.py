@@ -2,7 +2,7 @@
 
 __author__ = """Hank Corbett"""
 __email__ = "htc@unc.edu"
-__version__ = "0.0.2"
+__version__ = "0.0.3"
 
 __all__ = ["RicoHeartBeat", "RawStreamer", "EVRImageLoader"]
 
@@ -12,7 +12,11 @@ import os
 from dotenv import load_dotenv
 
 basedir = os.path.abspath(os.path.dirname(__file__))
-load_dotenv(os.path.join(basedir, ".env"))
+
+if os.path.isfile(os.path.join(os.path.expanduser("~"), ".ricoenv")):
+    load_dotenv(os.path.join(os.path.expanduser("~"), ".ricoenv"))
+else:
+    load_dotenv(os.path.join(basedir, ".env"))
 
 
 class Config(object):
