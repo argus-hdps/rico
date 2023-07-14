@@ -22,11 +22,13 @@ pymongo = "^4.3.3"
 pydantic = "^1.10.8"
 geojson-pydantic = "^0.6.2"
 numpy = "^1.24.3"
-ipython = "^8.14.0"
 sanitize-filename = "^1.2.0"
 pymongoarrow = "^0.7.0"
 pandas = "^2.0.2"
-qlsc = "^1.0.6"
+qlsc = { git = "https://github.com/corbettht/qlsc.git", branch="master", subdirectory="source" }
+watchdog = "^3.0.0"
+ray = "^2.5.1"
+boto3 = "^1.28.3"
 
 
 [tool.poetry.dev-dependencies]
@@ -36,6 +38,8 @@ isort = "^5.10.1"
 flake8 = "^4.0.1"
 Sphinx = "^7.0.1"
 pre-commit = "^3.3.2"
+ipython = "^8.14.0"
+
 
 [tool.poetry.scripts]
 rico = "argus_rico.cli:main"

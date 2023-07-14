@@ -33,6 +33,14 @@ def slack() -> None:
     slack_app_starter()
 
 
+@click.command("watch", short_help="Start Rico monitor for EFTE catalogs.")
+def watch() -> None:
+    """Starts the Rico Slack server."""
+    from .slack import slack_app_starter
+
+    slack_app_starter()
+
+
 @click.command("index_images", short_help="Index EVR images directly into MongoDB.")
 @click.argument("directories", nargs=-1, type=click.Path(exists=True))
 @pass_config
