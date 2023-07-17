@@ -135,7 +135,7 @@ def open_lcv_modal(ack, shortcut, client):
                 },
                 {
                     "type": "input",
-                    "block_id": "right_asciension",
+                    "block_id": "right_ascension",
                     "element": {
                         "type": "number_input",
                         "is_decimal_allowed": True,
