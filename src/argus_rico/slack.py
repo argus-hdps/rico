@@ -116,7 +116,7 @@ def open_lcv_modal(ack, shortcut, client):
                             "placeholder": {
                                 "type": "plain_text",
                                 "text": "Select a date",
-                                "emoji": "true",
+                                "emoji": True,
                             },
                             "action_id": "start_date",
                         },
@@ -126,7 +126,7 @@ def open_lcv_modal(ack, shortcut, client):
                             "placeholder": {
                                 "type": "plain_text",
                                 "text": "Select a date",
-                                "emoji": "true",
+                                "emoji": True,
                             },
                             "action_id": "end_date",
                         },
@@ -137,13 +137,13 @@ def open_lcv_modal(ack, shortcut, client):
                     "block_id": "right_asciension",
                     "element": {
                         "type": "number_input",
-                        "is_decimal_allowed": "true",
+                        "is_decimal_allowed": True,
                         "action_id": "number_input-action",
                     },
                     "label": {
                         "type": "plain_text",
                         "text": "Right Ascension",
-                        "emoji": "true",
+                        "emoji": True,
                     },
                 },
                 {
@@ -151,13 +151,13 @@ def open_lcv_modal(ack, shortcut, client):
                     "block_id": "declination",
                     "element": {
                         "type": "number_input",
-                        "is_decimal_allowed": "true",
+                        "is_decimal_allowed": True,
                         "action_id": "number_input-action",
                     },
                     "label": {
                         "type": "plain_text",
                         "text": "Declination",
-                        "emoji": "true",
+                        "emoji": True,
                     },
                 },
             ],
