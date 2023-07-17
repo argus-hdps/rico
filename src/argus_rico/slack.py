@@ -109,6 +109,7 @@ def open_lcv_modal(ack, shortcut, client):
                 },
                 {
                     "type": "actions",
+                    "block_id": "time_range",
                     "elements": [
                         {
                             "type": "datepicker",
@@ -182,9 +183,11 @@ def handle_submission(
     values = body["view"]["state"]["values"]
     user = body["user"]["id"]
 
+    print(values)
+
     target_name = sanitize(values["target_name"]["title"]["value"])
-    start_date = values["start_date"]["datepicker-action"]["selected_date"]
-    end_date = values["end_date"]["datepicker-action"]["selected_date"]
+    start_date = values["time_range"]["start_date"]["selected_date"]
+    end_date = values["time_range"]["end_date"]["selected_date"]
     right_ascension = float(values["right_ascension"]["number_input-action"]["value"])
     declination = float(values["declination"]["number_input-action"]["value"])
 
@@ -234,6 +237,10 @@ def handle_submission(
         return
 
     dm_channel = response["channel"]
+    print(
+        f"efte -n 72 autophot --mindate {start_date} --maxdate {end_date} -o {target_name} {right_ascension} -- {declination}"
+    )
+    return
 
     er = efte_runner.EFTERunner()
     er.run(
