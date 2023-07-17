@@ -1,13 +1,18 @@
-from watchdog.events import FileSystemEventHandler
+__all__ = ["EFTEWatcher", "EFTECatalogHandler"]
+
+from watchdog.events import FileSystemEvent, FileSystemEventHandler
 from watchdog.observers.polling import PollingObserver
+
+from . import get_logger
+
+log = get_logger(__name__)
 
 
 class EFTEWatcher:
-    def __init__(self, watch_path: str, format="fits"):
+    def __init__(self, watch_path: str, format="fits") -> None:
         self.watch_path = watch_path
-        self.file_format = "fits"
 
-    def watch(self):
+    def watch(self) -> None:
         event_handler = EFTECatalogHandler()
         observer = PollingObserver()
 
@@ -23,4 +28,7 @@ class EFTEWatcher:
 
 
 class EFTECatalogHandler(FileSystemEventHandler):
-    pass
+    def on_created(self, event: FileSystemEvent) -> None:
+        filepath = event.src_path
+        if filepath[-4] != ".cat":
+            return

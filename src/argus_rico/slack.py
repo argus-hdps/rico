@@ -107,7 +107,59 @@ def open_lcv_modal(ack, shortcut, client):
                     },
                     "label": {"type": "plain_text", "text": "Target Name"},
                 },
-                # ... rest of the blocks ...
+                {
+                    "type": "actions",
+                    "elements": [
+                        {
+                            "type": "datepicker",
+                            "initial_date": "2015-07-01",
+                            "placeholder": {
+                                "type": "plain_text",
+                                "text": "Select a date",
+                                "emoji": "true",
+                            },
+                            "action_id": "start_date",
+                        },
+                        {
+                            "type": "datepicker",
+                            "initial_date": "2030-01-01",
+                            "placeholder": {
+                                "type": "plain_text",
+                                "text": "Select a date",
+                                "emoji": "true",
+                            },
+                            "action_id": "end_date",
+                        },
+                    ],
+                },
+                {
+                    "type": "input",
+                    "block_id": "right_asciension",
+                    "element": {
+                        "type": "number_input",
+                        "is_decimal_allowed": "true",
+                        "action_id": "number_input-action",
+                    },
+                    "label": {
+                        "type": "plain_text",
+                        "text": "Right Ascension",
+                        "emoji": "true",
+                    },
+                },
+                {
+                    "type": "input",
+                    "block_id": "declination",
+                    "element": {
+                        "type": "number_input",
+                        "is_decimal_allowed": "true",
+                        "action_id": "number_input-action",
+                    },
+                    "label": {
+                        "type": "plain_text",
+                        "text": "Declination",
+                        "emoji": "true",
+                    },
+                },
             ],
         },
     )

@@ -45,6 +45,12 @@ class Config(object):
     MONGODB_URI = os.environ.get("MONGODB_URI") or None
     MONGO_DBNAME = os.environ.get("MONGO_DBNAME") or "hdps"
 
+    EFTE_DB_ADDR = os.environ.get("EFTE_DB_ADDR") or "127.0.0.1"
+    EFTE_DB_PORT = os.environ.get("EFTE_DB_PORT") or 5432
+    EFTE_DB_NAME = os.environ.get("EFTE_DB_NAME") or "transients"
+    EFTE_DB_USER = os.environ.get("EFTE_DB_USER") or None
+    EFTE_DB_PASS = os.environ.get("EFTE_DB_PASS") or None
+
 
 config = Config()
 
