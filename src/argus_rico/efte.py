@@ -1,16 +1,18 @@
-__all__ = ["Vetnet"]
+__all__ = ["VetNet"]
 """Data ingest support for EFTE transient catalogs."""
 import os
 from typing import Tuple
 
+import astropy.table as tbl
 import numpy as np
+import ray
 import tensorflow as tf
 import tensorflow.keras.models as models
 
 from . import s3
 
 
-class Vetnet:
+class VetNet:
     def __init__(self) -> None:
         """Initialize the Vetnet class.
 
@@ -83,3 +85,23 @@ class Vetnet:
         confidence = 1 - (1 / n_posterior_draws) * np.sum(entropy, axis=0)
 
         return mean_pred, low_pred, high_pred, confidence
+
+
+@ray.remote
+class EFTECatalogProcessor:
+    def __init__(self):
+        """Initialize the EFTECatalogProcessor class."""
+        self.vetnet = VetNet()
+
+    def vet_and_insert(self, filepath: str) -> None:
+        """Perform vetting and insertion for the given FITS table.
+
+        Args:
+            filepath (str): The path to the FITS table.
+
+        Returns:
+            None: This method does not return any value; it processes the FITS table.
+        """
+        table: tbl.Table = tbl.Table.read(filepath, format="fits")
+
+        print(len(table))

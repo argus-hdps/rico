@@ -1,18 +1,31 @@
 __all__ = ["EFTEWatcher", "EFTECatalogHandler"]
 
+import os
+import time
+from collections import defaultdict
+
+import ray
 from watchdog.events import FileSystemEvent, FileSystemEventHandler
 from watchdog.observers.polling import PollingObserver
 
-from . import get_logger
+from . import efte, get_logger
 
 log = get_logger(__name__)
 
 
 class EFTEWatcher:
-    def __init__(self, watch_path: str, format="fits") -> None:
-        self.watch_path = watch_path
+    def __init__(self, watch_path: str, format: str = "fits") -> None:
+        """Initialize the EFTEWatcher class.
+
+        Args:
+            watch_path (str): The path to the directory to watch for catalog files.
+            format (str, optional): The format of catalog files. Defaults to "fits".
+        """
+        self.watch_path = os.path.abspath(watch_path)
 
     def watch(self) -> None:
+        """Start watching the specified directory for catalog files."""
+        ray.init()
         event_handler = EFTECatalogHandler()
         observer = PollingObserver()
 
@@ -20,15 +33,32 @@ class EFTEWatcher:
         observer.start()
 
         try:
-            while observer.isAlive():
-                observer.join(1)
-        finally:
+            while True:
+                time.sleep(1)
+        except KeyboardInterrupt:
             observer.stop()
-            observer.join()
+        observer.join()
 
 
 class EFTECatalogHandler(FileSystemEventHandler):
+    def __init__(self):
+        """Initialize the EFTECatalogHandler class."""
+        self.efte_processors = defaultdict(efte.EFTECatalogProcessor.remote)
+
     def on_created(self, event: FileSystemEvent) -> None:
+        """Process the newly created catalog file.
+
+        Args:
+            event (FileSystemEvent): The event object representing the file creation.
+
+        Returns:
+            None: This method does not return any value; it processes the catalog file.
+        """
         filepath = event.src_path
-        if filepath[-4] != ".cat":
+        print("found: ", event.src_path)
+
+        if filepath[-4:] != ".cat":
             return
+        camera_id = os.path.basename(filepath)[:9]
+
+        self.efte_processors[camera_id].vet_and_insert.remote(filepath)
