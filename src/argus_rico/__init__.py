@@ -51,6 +51,10 @@ class Config(object):
     EFTE_DB_USER = os.environ.get("EFTE_DB_USER") or None
     EFTE_DB_PASS = os.environ.get("EFTE_DB_PASS") or None
 
+    WASABI_KEY_ID = os.environ.get("WASABI_KEY_ID") or None
+    WASABI_SECRET_KEY = os.environ.get("WASABI_SECRET_KEY") or None
+    WASABI_ENDPOINT = os.environ.get("WASABI_ENDPOINT") or None
+
 
 config = Config()
 
