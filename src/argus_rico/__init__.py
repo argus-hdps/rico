@@ -54,6 +54,11 @@ class Config(object):
     WASABI_KEY_ID = os.environ.get("WASABI_KEY_ID") or None
     WASABI_SECRET_KEY = os.environ.get("WASABI_SECRET_KEY") or None
     WASABI_ENDPOINT = os.environ.get("WASABI_ENDPOINT") or None
+    RICO_CACHE_DIR = os.environ.get("RICO_CACHE_DIR") or None
+    if RICO_CACHE_DIR is None:
+        RICO_CACHE_DIR = os.path.join(os.path.expanduser("~"), ".rico_cache")
+    if not os.path.isdir(RICO_CACHE_DIR):
+        os.makedirs(RICO_CACHE_DIR)
 
 
 config = Config()

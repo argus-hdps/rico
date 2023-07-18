@@ -1,6 +1,5 @@
 """Data ingest support for EFTE transient catalogs."""
 import os
-import time
 from typing import Tuple
 
 import numpy as np
@@ -26,7 +25,6 @@ class Vetnet:
         except OSError:
             s3share = s3.S3Share()
             s3share.download_vetnet()
-            time.sleep(5)
             self.model = models.load_model(
                 os.path.join(os.path.expanduser("~"), ".rico_cache", "hypersky_v7_v0")
             )

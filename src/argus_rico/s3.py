@@ -32,6 +32,7 @@ class S3Share:
         )
 
         self.vetnet_bucket = self.s3.Bucket("efte.vetnet")
+        self.catalog_bucket = self.s3.Bucket("hera.catalogs")
 
     def download_vetnet(self) -> NoReturn:
         """Download Vetnet data from S3.
@@ -48,6 +49,26 @@ class S3Share:
 
         self.vetnet_bucket.download_file(
             "hypersky_v7_v0.tar.gz",
+            cached_path,
+        )
+        outpath = os.path.dirname(cached_path)
+        file = tarfile.open(cached_path)
+        file.extractall(outpath)
+        file.close()
+
+    def download_atlas(self) -> NoReturn:
+        """Download ATLAS-RefCat 2 data from S3.
+
+        Downloads the atlas_feathercat.tar.gz file from the S3 bucket,
+        extracts its contents, and saves it in the cache directory.
+
+        Raises:
+            botocore.exceptions.ClientError: If the file download fails.
+        """
+        cached_path = os.path.join(config.RICO_CACHE_DIR, "atlas_feathercat.tar.gz")
+
+        self.catalog_bucket.download_file(
+            "atlas_feathercat.tar.gz",
             cached_path,
         )
         outpath = os.path.dirname(cached_path)
