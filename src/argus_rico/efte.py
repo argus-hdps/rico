@@ -1,3 +1,4 @@
+__all__ = ["Vetnet"]
 """Data ingest support for EFTE transient catalogs."""
 import os
 from typing import Tuple

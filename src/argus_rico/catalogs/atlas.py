@@ -1,3 +1,5 @@
+__all__ = ["MissingDirectoryError", "ATLASRefcat2"]
+
 import glob
 import os
 from concurrent.futures import ThreadPoolExecutor

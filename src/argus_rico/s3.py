@@ -1,3 +1,4 @@
+__all__ = ["S3AuthException", "S3Share"]
 """S3 Share module for handling Wasabi S3 interactions."""
 import os
 import tarfile
