@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "argus-rico"
-version = "0.0.4"
+version = "0.0.5"
 description = "Transient alert generation and database interaction for Argus and Evryscope"
 authors = ["Hank Corbett"]
 
@@ -48,6 +48,9 @@ ipython = "^8.14.0"
 
 [tool.poetry.scripts]
 rico = "argus_rico.cli:main"
+
+[tool.poetry.group.dev.dependencies]
+detect-secrets = "^1.4.0"
 
 [tool.isort]
 profile = "black"
