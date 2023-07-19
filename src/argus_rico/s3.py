@@ -34,6 +34,23 @@ class S3Share:
 
         self.vetnet_bucket = self.s3.Bucket("efte.vetnet")
         self.catalog_bucket = self.s3.Bucket("hera.catalogs")
+        self.stamps_bucket = "efte.stamps"
+
+    def upload_stamp(self, id: str) -> str:
+        """
+        Upload a stamp for to S3.
+
+        Args:
+            id (str): S3 key for the stamp (candidate ID)
+
+        Returns:
+            str: Pre-authenticated URL for the stamp file.
+        """
+        url = self.s3.generate_presigned_url(
+            ClientMethod="get_object",
+            Params={"Bucket": self.stamps_bucket, "Key": "invoice.pdf"},
+        )
+        return url
 
     def download_vetnet(self) -> NoReturn:
         """Download Vetnet data from S3.
