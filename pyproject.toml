@@ -1,11 +1,11 @@
 [tool.poetry]
 name = "argus-rico"
-version = "0.0.5"
+version = "0.0.6"
 description = "Transient alert generation and database interaction for Argus and Evryscope"
 authors = ["Hank Corbett"]
 
 [tool.poetry.dependencies]
-python = "^3.10,<3.11"
+python = "^3.9,<3.11"
 python-dotenv = "^0.19.0"
 fastavro = "^1.4.12"
 pyarrow = ">=10.0.0"
