@@ -4,6 +4,7 @@ import os
 from typing import Tuple
 
 import astropy.table as tbl
+import astropy.visualization as viz
 import numpy as np
 import ray
 import tensorflow as tf
@@ -34,6 +35,7 @@ class VetNet:
 
         self.BATCH_SIZE: int  # The batch size for data processing
         self.AUTOTUNE: int = tf.data.AUTOTUNE  # The buffer size for prefetching
+        self.zed = viz.ZScaleInterval()
 
     def prep_ds(self, ds: tf.data.Dataset) -> tf.data.Dataset:
         """Preprocess the input dataset.
@@ -52,6 +54,38 @@ class VetNet:
         # Use buffered prefetching on all datasets
         return ds.prefetch(buffer_size=self.AUTOTUNE)
 
+    def _normalize_triplet(self, data: np.ndarray) -> np.ndarray:
+        """Perform stamp normalization. Processes the reference, science, and
+        difference images separately.
+
+
+        Args:
+            data (np.ndarray): The input data for prediction.
+
+        Returns:
+            np.ndarray: Recursively normalized postage stamp cutout.
+        """
+        for i in range(data.shape[-1]):
+            data[:, :, i] = self.zed(data[:, :, i])
+
+        return data
+
+    def _normalize_stamps(self, data: np.ndarray) -> np.ndarray:
+        """Perform recursive stamp normalization. Processes the reference,
+        science, and difference images separately.
+
+
+        Args:
+            data (np.ndarray): The input data for prediction.
+
+        Returns:
+            np.ndarray: Recursively normalized postage stamp cutouts.
+        """
+        for i in range(data.shape[0]):
+            data[i, :, :, :] = self._normalize_triplet(data[i, :, :, :])
+
+        return data
+
     def mc_predict(
         self, data: np.ndarray, n_posterior_draws: int
     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
@@ -68,6 +102,8 @@ class VetNet:
             - high_pred (np.ndarray): The upper prediction bound.
             - confidence (np.ndarray): The confidence measure.
         """
+        data = self._normalize_stamps(data)
+
         pred_dists = np.array(
             [self.model(data, training=False) for _ in range(n_posterior_draws)]
         )
@@ -104,4 +140,5 @@ class EFTECatalogProcessor:
         """
         table: tbl.Table = tbl.Table.read(filepath, format="fits")
 
-        print(len(table))
+        stamps = table["stamps"].data
+        _ = self.vetnet.mc_predict(stamps)
