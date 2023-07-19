@@ -25,7 +25,6 @@ numpy = "^1.24.3"
 sanitize-filename = "^1.2.0"
 pymongoarrow = "^0.7.0"
 pandas = "^2.0.2"
-qlsc = { git = "https://github.com/corbettht/qlsc.git", branch="master", subdirectory="source" }
 watchdog = "^3.0.0"
 ray = "^2.5.1"
 boto3 = "^1.28.3"
@@ -34,6 +33,7 @@ scikit-image = "^0.21.0"
 psycopg = "^3.1.9"
 grpcio = "<=1.49.1"
 pre-commit = "^3.3.3"
+qlsc = ">=1.0.6"
 
 
 [tool.poetry.dev-dependencies]
