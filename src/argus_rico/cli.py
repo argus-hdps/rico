@@ -34,7 +34,7 @@ def slack() -> None:
 
 
 @click.command("watch", short_help="Start Rico monitor for EFTE catalogs.")
-@click.argument("directory", nargs=-1, type=click.Path(exists=True))
+@click.argument("directory", type=click.Path(exists=True))
 def watch(directory: str) -> None:
     """Starts the Rico directory monitor."""
     from .file_monitors import EFTEWatcher
@@ -79,3 +79,4 @@ def index_images(cli_config: Config, directories: Sequence[str]) -> None:
 
 main.add_command(slack)
 main.add_command(index_images)
+main.add_command(watch)

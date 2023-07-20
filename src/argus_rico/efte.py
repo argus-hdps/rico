@@ -10,7 +10,7 @@ import ray
 import tensorflow as tf
 import tensorflow.keras.models as models
 
-from . import s3
+from . import catalogs, efte_stream, s3
 
 
 class VetNet:
@@ -128,17 +128,36 @@ class EFTECatalogProcessor:
     def __init__(self):
         """Initialize the EFTECatalogProcessor class."""
         self.vetnet = VetNet()
+        self.atlas = catalogs.ATLASRefcat2()
+        self.producer = efte_stream.EFTEAlertStreamer()
 
-    def vet_and_insert(self, filepath: str) -> None:
-        """Perform vetting and insertion for the given FITS table.
+    def process(self, filepath: str) -> None:
+        """Perform vetting and crossmatching for the given FITS table.
 
         Args:
             filepath (str): The path to the FITS table.
 
         Returns:
-            None: This method does not return any value; it processes the FITS table.
+            Table: Returns the FITS table with normalized stamps, scores.
         """
         table: tbl.Table = tbl.Table.read(filepath, format="fits")
 
-        stamps = table["stamps"].data
-        _ = self.vetnet.mc_predict(stamps)
+        stamps = table["stamp"].data
+        mean_pred, _, _, confidence = self.vetnet.mc_predict(stamps, 10)
+
+        table["vetnet"] = confidence[:, 0]
+        table = table[mean_pred[:, 0] > 0.5]
+
+        table = table[table["vetnet"] > 0.4]  # fairly arbitrary...
+        if len(table) == 0:
+            return
+
+        crossmatches = []
+        for r in table:
+            phot = self.atlas.radial(
+                r["ra"], r["dec"], 0.01, max_g=25, return_area=False
+            )
+            phot = phot.sort_values(by="separation")
+            crossmatches.append(phot.to_dict(orient="records"))
+
+        self.producer.push_alert(table, crossmatches)

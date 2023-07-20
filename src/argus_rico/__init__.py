@@ -2,7 +2,7 @@
 
 __author__ = """Hank Corbett"""
 __email__ = "htc@unc.edu"
-__all__ = ["RicoHeartBeat", "RawStreamer", "EVRImageLoader"]
+__all__ = ["RicoHeartBeat", "RawAlertStreamer", "EVRImageLoader"]
 
 import importlib.metadata
 import logging
@@ -41,6 +41,7 @@ class Config(object):
     KAFKA_PORT = os.environ.get("KAFKA_PORT") or "9092"
     HBEAT_TOPIC = os.environ.get("HBEAT_TOPIC") or "rico.heartbeat"
     RAW_TOPIC_BASE = os.environ.get("RAW_TOPIC_BASE") or "rico.candidates.raw"
+    EFTE_TOPIC_BASE = os.environ.get("EFTE_TOPIC_BASE") or "rico.efte.alerts"
     EVR_IMAGE_TOPIC = os.environ.get("RAW_TOPIC_BASE") or "rico.images.evr"
 
     MONGODB_URI = os.environ.get("MONGODB_URI") or None
@@ -97,6 +98,6 @@ get_logger(__name__).addHandler(logging.StreamHandler())
 # get_logger(__name__).addHandler(logging.NullHandler())
 
 
+from .efte_stream import RawAlertStreamer  # noqa: E402
 from .heartbeat import RicoHeartBeat  # noqa: E402
 from .images import EVRImageLoader  # noqa: E402
-from .raw_streamer import RawStreamer  # noqa: E402

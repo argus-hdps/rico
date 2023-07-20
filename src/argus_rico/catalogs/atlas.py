@@ -73,7 +73,7 @@ class ATLASRefcat2:
 
             else:
                 raise MissingDirectoryError("ATLAS Refcat is not installed")
-        self.dataset = os.path.join(config.RICO_CACHE_DIR, "atlas_feathercat.tar.gz")
+        self.dataset = os.path.join(config.RICO_CACHE_DIR, "atlas_refcat2")
 
     def radial(
         self,

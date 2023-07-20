@@ -1,7 +1,7 @@
 {
-    "doc": "avro alert schema, evryscope/argus optical array, EFTE pipeline",
-    "name": "raw_candidate",
-    "namespace": "rico.efte",
+    "doc": "avro alert schema, evryscope/argus optical array, EFTE candidate.",
+    "name": "candidate",
+    "namespace": "rico.efte_alert",
     "type": "record",
     "version": "0.1",
     "fields": [

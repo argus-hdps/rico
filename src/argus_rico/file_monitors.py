@@ -14,7 +14,7 @@ log = get_logger(__name__)
 
 
 class EFTEWatcher:
-    def __init__(self, watch_path: str, format: str = "fits") -> None:
+    def __init__(self, watch_path: str) -> None:
         """Initialize the EFTEWatcher class.
 
         Args:
@@ -61,4 +61,4 @@ class EFTECatalogHandler(FileSystemEventHandler):
             return
         camera_id = os.path.basename(filepath)[:9]
 
-        self.efte_processors[camera_id].vet_and_insert.remote(filepath)
+        self.efte_processors[camera_id].process.remote(filepath)

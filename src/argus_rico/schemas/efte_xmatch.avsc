@@ -1,0 +1,45 @@
+{
+    "doc": "avro alert schema, evryscope/argus optical array, EFTE xmatches.",
+    "name": "xmatches",
+    "namespace": "rico.efte_alert",
+    "type": "record",
+    "version": "0.1",
+    "fields": [
+        {
+            "name": "ra", 
+            "type": "float"
+        },
+        {
+            "name": "dec", 
+            "type": "float"
+        },
+        {
+            "name": "parallax", 
+            "type": "float"
+        },
+        {
+            "name": "pmra", 
+            "type": "float"
+        },
+        {
+            "name": "pmdec", 
+            "type": "float"
+        },
+        {
+            "name": "g", 
+            "type": "float"
+        },
+        {
+            "name": "r", 
+            "type": "float"
+        },
+        {
+            "name": "i", 
+            "type": "float"
+        },
+        {
+            "name": "separation", 
+            "type": "float"
+        }
+    ]
+}
