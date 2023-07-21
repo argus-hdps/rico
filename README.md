@@ -8,7 +8,7 @@
   <h3 align="center">Rico: The Argus Optical Array Data Management System</h3>
 
   <p align="center">
-    Images, light curves, and transient alerts from the Argus Optical Array and the Evryscopes
+    Images, light curves, and transient alerts from the Argus Optical Array and the Evryscopes.
     <br />
     <a href="https://github.com/argus-hdps/rico"><strong>Explore the docs »</strong></a>
     <br />
@@ -18,8 +18,7 @@
     <a href="https://github.com/argus-hdps/rico/issues">Request Feature</a>
   </p>
 </p>
-
-
+[![PyPI version](https://badge.fury.io/py/argus-rico.svg)](https://badge.fury.io/py/argus-rico)
 
 <!-- TABLE OF CONTENTS -->
 <details open="open">
@@ -56,8 +55,8 @@ Evryscope projects, including internal and external use. This package contains b
 
 ### References
 
-Rico works primarily with data products from the Evryscope and Argus pipelines,
-which are described in
+Rico works primarily with data products from the Evryscope Fast Transient Engine (EFTE)
+and the Argus Hierarchical Data Processing System (HDPS/Hera), which are described in
 [Corbett+2023](https://iopscience.iop.org/article/10.3847/1538-4365/acbd41#apjsacbd41s7)
 and [Corbett+2022](https://arxiv.org/abs/2207.14304), respectively. 
 
