@@ -5,16 +5,14 @@
     <img src="images/logo.png" alt="Logo">
   </a>
 
-  <h3 align="center">Rico: The Evryscope-Argus Transient Reporter</h3>
+  <h3 align="center">Rico: The Argus Optical Array Data Management System</h3>
 
   <p align="center">
-    Transient alerts from the Argus Optical Array and the Evryscopes. This package contains schemas for the Apache Avro-formatted alert stream, plus a simple reflection to Python objects and some sample code for pulling alerts from the public broker with reasonable filters. 
+    Images, light curves, and transient alerts from the Argus Optical Array and the Evryscopes
     <br />
     <a href="https://github.com/argus-hdps/rico"><strong>Explore the docs »</strong></a>
     <br />
-    <br />
-    <a href="https://github.com/argus-hdps/rico">View Demo</a>
-    ·
+    <br />    ·
     <a href="https://github.com/argus-hdps/rico/issues">Report Bug</a>
     ·
     <a href="https://github.com/argus-hdps/rico/issues">Request Feature</a>
@@ -41,8 +39,7 @@
       </ul>
     </li>
     <li><a href="#usage">Usage</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#contributing">Contributing</a></li>
+    <li><a href="#roadmap">Roadmap and Status</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
     <li><a href="#acknowledgements">Acknowledgements</a></li>
@@ -54,88 +51,39 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-This is a blank README.md to be inserted into your Argus-HDPS project with CookieCutter. 
+Rico is a data access and management pipeline for the Argus Optical Array and
+Evryscope projects, including internal and external use. This package contains both internal distribution systems and end-user access tools. 
 
-To use it, create a new package with: 
+### References
 
-  ```sh
-  cookiecutter git@github.com:argus-hdps/cookiecutter-argus-hdps.git    
-  ```                                       
-and enter a few parameters as prompted. Boom, you are ready to go with a bunch of sensible defaults!                                                                                                                         
-
-### Built With
-This is a list of the base packages that you should be familiar with to get ready 
-
-* []()
-* []()
-* []()
-
-<!-- GETTING STARTED -->
-## Getting Started
-
-To get a local copy up and running follow these simple steps.
+Rico works primarily with data products from the Evryscope and Argus pipelines,
+which are described in
+[Corbett+2023](https://iopscience.iop.org/article/10.3847/1538-4365/acbd41#apjsacbd41s7)
+and [Corbett+2022](https://arxiv.org/abs/2207.14304), respectively. 
 
 ### Prerequisites
 
-This is an example of how to list things you need to use the software and how to install them.
-* [Poetry](https://python-poetry.org)_ 
-* Python3.9 or later
+This project currently requires pre-authentication with the project to access the alert
+stream and data store. If you're interested in working with us, please reach
+out! 
 
 ### Installation
+This project is distributed via PyPI as `argus_rico`. 
 
-1. Clone the repo
-   ```sh
-   git clone https://github.com/argus-hdps/rico
-   ```
-2. Create the Poetry env
-   ```sh
-   cd rico/
-   poetry install
-   ```
-3. Activate the shell, do whatever
-  ```sh
-  poetry shell
-  poetry run ...
-  ```
+<!-- ROADMAP AND STATUS -->
+## Roadmap and Status
 
+Rico is currently in an alpha state, and is currently being tested in ongoing transient
+science programs with the Evryscopes. We expect to fully integrate with the
+Argus Pathfinder alert stream later in 2023 in a 1.0 release. 
 
-
-
-<!-- USAGE EXAMPLES -->
-## Usage
-
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
-
-_For more examples, please refer to the [Documentation](https://example.com)_
-
-
-
-<!-- ROADMAP -->
-## Roadmap
 
 See the [open issues](https://github.com/argus-hdps/rico/issues) for a list of proposed features (and known issues).
-
-
-
-<!-- CONTRIBUTING -->
-## Contributing
-
-Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-
 
 <!-- LICENSE -->
 ## License
 
 Distributed under the MIT License. See `LICENSE` for more information.
-
-
 
 <!-- CONTACT -->
 ## Contact
@@ -143,16 +91,6 @@ Distributed under the MIT License. See `LICENSE` for more information.
 Hank Corbett - htc@unc.edu
 
 Project Link: [https://github.com/argus-hdps/rico](https://github.com/argus-hdps/rico)
-
-
-
-<!-- ACKNOWLEDGEMENTS -->
-## Acknowledgements
-
-* []()
-* []()
-* []()
-
 
 
 
