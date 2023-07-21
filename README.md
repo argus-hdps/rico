@@ -12,12 +12,13 @@
     <br />
     <a href="https://github.com/argus-hdps/rico"><strong>Explore the docs »</strong></a>
     <br />
-    <br />    ·
+    <br />    
     <a href="https://github.com/argus-hdps/rico/issues">Report Bug</a>
     ·
     <a href="https://github.com/argus-hdps/rico/issues">Request Feature</a>
   </p>
 </p>
+
 [![PyPI version](https://badge.fury.io/py/argus-rico.svg)](https://badge.fury.io/py/argus-rico)
 
 <!-- TABLE OF CONTENTS -->
