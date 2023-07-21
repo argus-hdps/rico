@@ -9,9 +9,11 @@ import astropy.table as tbl
 import blosc
 import fastavro as fa
 import orjson
+from confluent_kafka import KafkaException
 
-from . import config
-from .producer import Producer
+from .. import config
+from ..consumerB import Consumer
+from ..producer import Producer
 
 PATH = os.path.realpath(os.path.dirname(__file__))
 
@@ -177,6 +179,36 @@ class EFTEAlertStreamer(Producer):
 
         """
         avro_data = self._parse_catalog(catalog, xmatches)
-        topic = self.topic_base + f'.{catalog.meta["CCDDETID"]}'
-
+        topic = self.topic_base
         self.send_binary(avro_data, topic=topic)
+
+
+class EFTEAlertReceiver(Consumer):
+    def __init__(self, group: str) -> None:
+        super().__init__(
+            host=config.KAFKA_ADDR,
+            port=config.KAFKA_PORT,
+            topic=config.EFTE_TOPIC_BASE,
+            group_id=group,
+        )
+
+    def poll_and_record(self) -> None:
+        c = self.get_consumer()
+
+        c.subscribe(self.topic)
+        try:
+            while True:
+                event = c.poll(1.0)
+                if event is None:
+                    continue
+                if event.error():
+                    raise KafkaException(event.error())
+                else:
+                    # val = event.value().decode('utf8')
+                    partition = event.partition()
+                    print(f"Received from partition {partition}    ")
+                    # consumer.commit(event)
+        except KeyboardInterrupt:
+            print("Canceled by user.")
+        finally:
+            c.close()

@@ -42,7 +42,7 @@ class Config(object):
     HBEAT_TOPIC = os.environ.get("HBEAT_TOPIC") or "rico.heartbeat"
     RAW_TOPIC_BASE = os.environ.get("RAW_TOPIC_BASE") or "rico.candidates.raw"
     EFTE_TOPIC_BASE = os.environ.get("EFTE_TOPIC_BASE") or "rico.efte.alerts"
-    EVR_IMAGE_TOPIC = os.environ.get("RAW_TOPIC_BASE") or "rico.images.evr"
+    EVR_IMAGE_TOPIC = os.environ.get("EVR_IMAGE_TOPIC") or "rico.images.evr"
 
     MONGODB_URI = os.environ.get("MONGODB_URI") or None
     MONGO_DBNAME = os.environ.get("MONGO_DBNAME") or "hdps"

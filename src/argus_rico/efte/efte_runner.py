@@ -1,3 +1,4 @@
+"""(very thin) wrapper for running EFTE CLI utilities programmatically in a thread"""
 import subprocess
 import threading
 from typing import Optional

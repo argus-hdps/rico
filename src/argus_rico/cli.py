@@ -37,7 +37,7 @@ def slack() -> None:
 @click.argument("directory", type=click.Path(exists=True))
 def watch(directory: str) -> None:
     """Starts the Rico directory monitor."""
-    from .file_monitors import EFTEWatcher
+    from .efte.watchdog import EFTEWatcher
 
     ew = EFTEWatcher(watch_path=directory)
     ew.watch()

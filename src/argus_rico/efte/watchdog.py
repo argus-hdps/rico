@@ -8,7 +8,8 @@ import ray
 from watchdog.events import FileSystemEvent, FileSystemEventHandler
 from watchdog.observers.polling import PollingObserver
 
-from . import efte, get_logger
+from .. import get_logger
+from .processor import EFTECatalogProcessor
 
 log = get_logger(__name__)
 
@@ -43,7 +44,7 @@ class EFTEWatcher:
 class EFTECatalogHandler(FileSystemEventHandler):
     def __init__(self):
         """Initialize the EFTECatalogHandler class."""
-        self.efte_processors = defaultdict(efte.EFTECatalogProcessor.remote)
+        self.efte_processors = defaultdict(EFTECatalogProcessor.remote)
 
     def on_created(self, event: FileSystemEvent) -> None:
         """Process the newly created catalog file.
