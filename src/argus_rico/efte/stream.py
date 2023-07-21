@@ -2,17 +2,18 @@ __all__ = ["RawAlertStreamer"]
 
 import io
 import os
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 from uuid import uuid4
 
 import astropy.table as tbl
 import blosc
 import fastavro as fa
 import orjson
+import pandas as pd
 from confluent_kafka import KafkaException
 
 from .. import config
-from ..consumerB import Consumer
+from ..consumer import Consumer
 from ..producer import Producer
 
 PATH = os.path.realpath(os.path.dirname(__file__))
@@ -112,17 +113,9 @@ class EFTEAlertStreamer(Producer):
         )
         self.topic_base = config.EFTE_TOPIC_BASE
 
-        # Parse alert schema
-        named_schemas = {}
-        with open(f"{PATH}/schemas/efte_alert.avsc", "rb") as f:
-            alert_schema = orjson.loads(f.read())
-        with open(f"{PATH}/schemas/efte_candidate.avsc", "rb") as f:
-            candidate_schema = orjson.loads(f.read())
-        with open(f"{PATH}/schemas/efte_xmatch.avsc", "rb") as f:
-            xmatch_schema = orjson.loads(f.read())
-        _ = fa.parse_schema(candidate_schema, named_schemas)
-        _ = fa.parse_schema(xmatch_schema, named_schemas)
-        self.parsed_alert_schema = fa.parse_schema(alert_schema, named_schemas)
+        self.parsed_alert_schema = fa.schema.load_schema(
+            f"{PATH}/schemas/efte.alert.avsc"
+        )
 
     def _parse_catalog(
         self, catalog: tbl.Table, xmatches: List[Dict[str, List]]
@@ -157,7 +150,7 @@ class EFTEAlertStreamer(Producer):
             candidate["camera"] = camera_id
 
             alert_data["candidate"] = candidate
-            alert_data["xmatches"] = xmatches[i]
+            alert_data["xmatch"] = xmatches[i]
 
             records.append(alert_data)
 
@@ -184,7 +177,18 @@ class EFTEAlertStreamer(Producer):
 
 
 class EFTEAlertReceiver(Consumer):
-    def __init__(self, group: str) -> None:
+    def __init__(
+        self, group: str, output_path: str, filter_path: Optional[str]
+    ) -> None:
+        """Initialize the EFTEAlertReceiver class.
+
+        Args:
+            group (str): The Kafka consumer group ID.
+            output_path (str): The path where filtered candidate data will be written.
+            filter_path (Optional[str]): The path to the text file containing filter conditions for xmatch data.
+                If provided, candidates will be filtered based on the conditions in the file.
+                Each condition should be in the format: 'column_name operator value'.
+        """
         super().__init__(
             host=config.KAFKA_ADDR,
             port=config.KAFKA_PORT,
@@ -192,10 +196,21 @@ class EFTEAlertReceiver(Consumer):
             group_id=group,
         )
 
+        self.parsed_alert_schema = fa.schema.load_schema(
+            f"{PATH}/schemas/efte.alert.avsc"
+        )
+        self.filter_path = filter_path
+        self.output_path = output_path
+
     def poll_and_record(self) -> None:
+        """Start polling for Kafka messages and process the candidates based on filter conditions."""
         c = self.get_consumer()
 
-        c.subscribe(self.topic)
+        c.subscribe(
+            [
+                self.topic,
+            ]
+        )
         try:
             while True:
                 event = c.poll(1.0)
@@ -204,11 +219,65 @@ class EFTEAlertReceiver(Consumer):
                 if event.error():
                     raise KafkaException(event.error())
                 else:
-                    # val = event.value().decode('utf8')
-                    partition = event.partition()
-                    print(f"Received from partition {partition}    ")
-                    # consumer.commit(event)
+                    candidates = self._decode(event.value())
+                    self._filter_candidates(candidates)
+
         except KeyboardInterrupt:
             print("Canceled by user.")
         finally:
             c.close()
+
+    def _decode(self, message: bytes) -> List[Dict[str, Any]]:
+        """Decode the AVRO message into a list of dictionaries.
+
+        Args:
+            message (bytes): The AVRO message received from Kafka.
+
+        Returns:
+            List[Dict[str, Any]]: A list of candidate dictionaries.
+        """
+        stringio = io.BytesIO(message)
+        stringio.seek(0)
+
+        records = []
+        for record in fa.reader(stringio):
+            records.append(record)
+        return records
+
+    def _write_candidate(self, candidate: Dict[str, Any]) -> None:
+        """Write the candidate data to a JSON file.
+
+        Args:
+            candidate (Dict[str, Any]): The candidate dictionary to be written to the JSON file.
+        """
+        with open(
+            os.path.join(self.output_path, f"{candidate['objectId']}.json"), "w"
+        ) as f:
+            f.write(orjson.dumps(candidate))
+
+    def _filter_candidates(self, candidates: List[Dict[str, Any]]) -> None:
+        """Filter the candidates based on the specified filter conditions.
+
+        Args:
+            candidates (List[Dict[str, Any]]): The list of candidate dictionaries to be filtered.
+
+        Note:
+            If the 'filter_path' is provided, the candidates will be filtered based on the conditions
+            specified in the text file. If 'xmatch' field is empty or 'filter_path' is not provided,
+            all candidates will be written to the output.
+        """
+        if self.filter_path is not None:
+            with open(self.filter_path, "r") as file:
+                filter_conditions = file.read().splitlines()
+            filter_conditions = [f for f in filter_conditions if len(f) > 3]
+
+        for candidate in candidates:
+            if len(candidate["xmatch"]) > 0 and self.filter_path is not None:
+                xmatch = pd.DataFrame.from_records(candidate["xmatch"])
+                for condition in filter_conditions:
+                    column_name, operator, value = condition.split()
+                    xmatch = xmatch.query(f"{column_name} {operator} {value}")
+                if len(xmatch) > 0:
+                    self._write_candidate(candidate)
+            else:
+                self._write_candidate(candidate)

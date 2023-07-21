@@ -1,20 +1,20 @@
 {
-	"namespace": "rico",
+	"namespace": "efte",
 	"type": "record",
-	"name": "efte_alert",
+	"name": "alert",
 	"doc": "avro alert schema for EFTE-generated alerts ",
 	"version": "0.1",
 	"fields": [
         {"name": "schemavsn", "type": "string", "doc": "schema version used"},
         {"name": "publisher", "type": "string", "doc": "origin of alert packet"},
 		{"name": "objectId", "type": "string", "doc": "object identifier or name"},
-		{"name": "candidate", "type": "rico.efte_alert.candidate"},
-		{"name": "xmatches", 
+		{"name": "candidate", "type": "candidate"},
+		{"name": "xmatch", 
             "type": [
                 "null" ,
                 {
                 "type": "array",
-                "items": "rico.efte_alert.xmatches"
+                "items": "xmatch"
                 }
                 ],
              "default": null}

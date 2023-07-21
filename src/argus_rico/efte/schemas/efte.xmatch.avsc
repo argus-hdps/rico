@@ -1,7 +1,7 @@
 {
     "doc": "avro alert schema, evryscope/argus optical array, EFTE xmatches.",
-    "name": "xmatches",
-    "namespace": "rico.efte_alert",
+    "name": "xmatch",
+    "namespace": "efte",
     "type": "record",
     "version": "0.1",
     "fields": [
