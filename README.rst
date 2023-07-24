@@ -55,7 +55,7 @@ Project Link: `https://github.com/argus-hdps/rico`
     :target: https://pypi.org/project/argus_rico
     :alt: Rico's PyPI Status
 
-.. |Documentation Status| image:: https://readthedocs.org/projects/argus_rico/badge/?version=latest
+.. |Documentation Status| image:: https://readthedocs.org/projects/rico/badge/?version=latest
    :target: http://rico.readthedocs.io/?badge=latest
 
 .. |Pre-Commit| image:: https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white
