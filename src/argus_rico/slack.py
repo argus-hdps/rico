@@ -13,10 +13,11 @@ from . import images as rimages
 
 log = get_logger("slack_bot")
 
-slack_app = App(
-    token=config.SLACK_BOT_TOKEN,
-    signing_secret=config.SLACK_SIGNING_SECRET,
-)
+if config.SLACK_BOT_TOKEN is not None:
+    slack_app = App(
+        token=config.SLACK_BOT_TOKEN,
+        signing_secret=config.SLACK_SIGNING_SECRET,
+    )
 
 
 @slack_app.event("message")

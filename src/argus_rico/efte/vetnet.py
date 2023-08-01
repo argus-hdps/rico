@@ -3,12 +3,14 @@ __all__ = ["VetNet"]
 import os
 from typing import Tuple
 
-import astropy.visualization as viz
-import numpy as np
-import tensorflow as tf
-import tensorflow.keras.models as models
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 
-from .. import s3
+import astropy.visualization as viz  # noqa: E402
+import numpy as np  # noqa: E402
+import tensorflow as tf  # noqa: E402
+import tensorflow.keras.models as models  # noqa: E402
+
+from .. import s3  # noqa: E402
 
 
 class VetNet:

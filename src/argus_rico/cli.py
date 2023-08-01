@@ -33,14 +33,37 @@ def slack() -> None:
     slack_app_starter()
 
 
-@click.command("watch", short_help="Start Rico monitor for EFTE catalogs.")
+@click.command("loadcats", short_help="Start Rico monitor for EFTE catalogs.")
 @click.argument("directory", type=click.Path(exists=True))
-def watch(directory: str) -> None:
+def loadcats(directory: str) -> None:
     """Starts the Rico directory monitor."""
     from .efte.watchdog import EFTEWatcher
 
     ew = EFTEWatcher(watch_path=directory)
     ew.watch()
+
+
+@click.command("viewstream", short_help="Start Rico event stream monitor.")
+@click.option(
+    "--filter", "-f", type=click.Path(exists=True, dir_okay=False), default=None
+)
+@click.option("--outdir", "-o", type=click.Path(file_okay=False), default="rico_alerts")
+@click.option("--group", "-g", type=str, default="argus-spec")
+def viewstream(filter: str, outdir: str, group: str) -> None:
+    """Starts the Rico directory monitor."""
+    import os
+
+    from .efte.stream import EFTEAlertReceiver
+
+    if not os.path.isdir(outdir):
+        os.makedirs(outdir)
+
+    ear = EFTEAlertReceiver(
+        output_path=outdir,
+        filter_path=filter,
+        group=group,
+    )
+    ear.watch()
 
 
 @click.command("index_images", short_help="Index EVR images directly into MongoDB.")
@@ -79,4 +102,5 @@ def index_images(cli_config: Config, directories: Sequence[str]) -> None:
 
 main.add_command(slack)
 main.add_command(index_images)
-main.add_command(watch)
+main.add_command(loadcats)
+main.add_command(viewstream)

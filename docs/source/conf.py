@@ -32,4 +32,6 @@ html_static_path = ["_static"]
 html_theme_options = {
     "light_logo": "argus_logo_light.png",
     "dark_logo": "argus_logo_dark.png",
+    "announcement": "<em>Important</em>: This package is currently under construction! Contact us for more info.",
 }
+html_title = "Rico Docs"
