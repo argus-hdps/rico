@@ -26,7 +26,6 @@ class Timer:
     def ping(self, message):
         if self.log is not None:
             self.log.info(
-                message,
-                f"@ {self.t * 1000:0.0f} ms ({self.t_since_last_ping * 1000:0.0f} ms delta)",
+                f"@ {self.t * 1000:0.0f} ms ({self.t_since_last_ping * 1000:0.0f} ms delta): {message}",
             )
         self.last_ping = time.perf_counter()

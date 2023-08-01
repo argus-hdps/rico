@@ -39,11 +39,12 @@ class EFTECatalogProcessor:
 
         table["vetnet"] = confidence[:, 0]
         table = table[mean_pred[:, 0] > 0.5]
-
         table = table[table["vetnet"] > 0.4]  # fairly arbitrary...
+  
+        clock.ping(f"Reporting {len(table)} candidates in {name}")
+        
         if len(table) == 0:
             return
-        clock.ping(f"Reporting {len(table)} candidates in {name}")
         crossmatches = []
         for r in table:
             phot = self.atlas.radial(

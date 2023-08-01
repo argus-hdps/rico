@@ -1,6 +1,5 @@
 __all__ = ["RawAlertStreamer"]
 
-import base64
 import io
 import os
 from typing import Any, Dict, List, Optional, Tuple
@@ -58,9 +57,7 @@ class RawAlertStreamer(Producer):
 
         records = []
         for r in tab:
-            stamp = base64.b64encode(blosc.compress(r["stamp"].tobytes())).decode(
-                "utf-8"
-            )
+            stamp = blosc.compress(r["stamp"].tobytes())
             record = dict(r)
             record["stamp"] = stamp
             record["epoch"] = mjd
@@ -135,6 +132,11 @@ class EFTEAlertStreamer(Producer):
         """
         tab = catalog
 
+        if 'MJD' not in tab.meta:
+            tab.meta['MJD'] = 60000.1
+        if 'CCDDETID' not in tab.meta:
+            tab.meta['CCDDETID'] = 'ML3103817'
+
         mjd = tab.meta["MJD"]
         camera_id = tab.meta["CCDDETID"]
 
@@ -146,9 +148,8 @@ class EFTEAlertStreamer(Producer):
                 "objectId": str(uuid4()),
             }
 
-            stamp = base64.b64encode(blosc.compress(r["stamp"].tobytes())).decode(
-                "utf-8"
-            )
+            stamp = blosc.compress(r["stamp"].tobytes())
+            
             candidate = dict(r)
             candidate["stamp"] = stamp
             candidate["epoch"] = mjd
