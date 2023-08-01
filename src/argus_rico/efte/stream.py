@@ -1,5 +1,6 @@
 __all__ = ["RawAlertStreamer"]
 
+import base64
 import io
 import os
 from typing import Any, Dict, List, Optional, Tuple
@@ -57,7 +58,9 @@ class RawAlertStreamer(Producer):
 
         records = []
         for r in tab:
-            stamp = blosc.compress(r["stamp"].tobytes())
+            stamp = base64.b64encode(blosc.compress(r["stamp"].tobytes())).decode(
+                "utf-8"
+            )
             record = dict(r)
             record["stamp"] = stamp
             record["epoch"] = mjd
@@ -143,7 +146,9 @@ class EFTEAlertStreamer(Producer):
                 "objectId": str(uuid4()),
             }
 
-            stamp = blosc.compress(r["stamp"].tobytes())
+            stamp = base64.b64encode(blosc.compress(r["stamp"].tobytes())).decode(
+                "utf-8"
+            )
             candidate = dict(r)
             candidate["stamp"] = stamp
             candidate["epoch"] = mjd

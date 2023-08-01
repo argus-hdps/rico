@@ -63,7 +63,7 @@ def viewstream(filter: str, outdir: str, group: str) -> None:
         filter_path=filter,
         group=group,
     )
-    ear.watch()
+    ear.poll_and_record()
 
 
 @click.command("index_images", short_help="Index EVR images directly into MongoDB.")
