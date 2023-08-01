@@ -11,8 +11,6 @@ from watchdog.observers.polling import PollingObserver
 from .. import get_logger
 from .processor import EFTECatalogProcessor
 
-log = get_logger(__name__)
-
 
 class EFTEWatcher:
     def __init__(self, watch_path: str) -> None:
@@ -45,6 +43,7 @@ class EFTECatalogHandler(FileSystemEventHandler):
     def __init__(self):
         """Initialize the EFTECatalogHandler class."""
         self.efte_processors = defaultdict(EFTECatalogProcessor.remote)
+        self.log = get_logger(__name__)
 
     def on_created(self, event: FileSystemEvent) -> None:
         """Process the newly created catalog file.
@@ -56,10 +55,11 @@ class EFTECatalogHandler(FileSystemEventHandler):
             None: This method does not return any value; it processes the catalog file.
         """
         filepath = event.src_path
-        print("found: ", event.src_path)
 
         if filepath[-4:] != ".cat":
             return
         camera_id = os.path.basename(filepath)[:9]
+
+        self.log.info(f"New cat for {camera_id}: {filepath}")
 
         self.efte_processors[camera_id].process.remote(filepath)
