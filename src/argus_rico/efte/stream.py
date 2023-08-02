@@ -3,7 +3,7 @@ __all__ = ["EFTEAlertReceiver", "EFTEAlertStreamer"]
 import base64
 import io
 import os
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 from uuid import uuid4
 
 import astropy.table as tbl
@@ -210,12 +210,16 @@ class EFTEAlertReceiver(Consumer):
             filter_conditions = [f for f in filter_conditions if len(f) > 3]
 
         for alert in alerts:
-            if len(alert["xmatch"]) > 0 and self.filter_path is not None:
-                xmatch = pd.DataFrame.from_records(alert["xmatch"])
-                for condition in filter_conditions:
-                    column_name, operator, value = condition.split()
-                    xmatch = xmatch.query(f"{column_name} {operator} {value}")
-                if len(xmatch) > 0:
-                    self._write_candidate(alert)
+            if self.filter_path is not None:
+                if len(alert["xmatch"]) > 0:
+                    xmatch = pd.DataFrame.from_records(alert["xmatch"])
+                    xmatch["g-r"] = xmatch["g"] - xmatch["r"]
+                    for condition in filter_conditions:
+                        column_name, operator, value = condition.split()
+                        xmatch = xmatch.query(f"{column_name} {operator} {value}")
+                    if len(xmatch) > 0:
+                        self._write_candidate(alert)
+                else:
+                    return
             else:
                 self._write_candidate(alert)
