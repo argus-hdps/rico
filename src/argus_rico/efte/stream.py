@@ -149,7 +149,7 @@ class EFTEAlertStreamer(Producer):
                 "objectId": str(uuid4()),
             }
 
-            stamp = blosc.compress(r["stamp_bytes"].tobytes())
+            stamp = blosc.compress(r["stamp"].tobytes())
 
             candidate = dict(r)
             candidate["stamp_bytes"] = stamp
