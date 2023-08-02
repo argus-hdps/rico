@@ -58,9 +58,9 @@ class RawAlertStreamer(Producer):
 
         records = []
         for r in tab:
-            stamp = blosc.compress(r["stamp"].tobytes())
+            stamp = blosc.compress(r["stamp_bytes"].tobytes())
             record = dict(r)
-            record["stamp"] = stamp
+            record["stamp_bytes"] = stamp
             record["epoch"] = mjd
             record["camera"] = camera_id
 
@@ -149,10 +149,10 @@ class EFTEAlertStreamer(Producer):
                 "objectId": str(uuid4()),
             }
 
-            stamp = blosc.compress(r["stamp"].tobytes())
+            stamp = blosc.compress(r["stamp_bytes"].tobytes())
 
             candidate = dict(r)
-            candidate["stamp"] = stamp
+            candidate["stamp_bytes"] = stamp
             candidate["epoch"] = mjd
             candidate["camera"] = camera_id
 
@@ -258,8 +258,8 @@ class EFTEAlertReceiver(Consumer):
         Args:
             candidate (Dict[str, Any]): The candidate dictionary to be written to the JSON file.
         """
-        alert["candidate"]["stamp"] = base64.b64encode(
-            alert["candidate"]["stamp"]
+        alert["candidate"]["stamp_bytes"] = base64.b64encode(
+            alert["candidate"]["stamp_bytes"]
         ).decode("utf-8")
         with open(
             os.path.join(self.output_path, f"{alert['objectId']}.json"), "wb"
