@@ -58,8 +58,17 @@ class EFTECandidate(BaseModel):
 
     @property
     def stamp(self):
-        return np.frombuffer(
-            blosc.decompress(base64.b64decode(self.stamp_bytes)), dtype=np.float32
+        return (
+            np.frombuffer(
+                blosc.decompress(
+                    base64.b64decode(
+                        self.stamp_bytes,
+                    )
+                ),
+                dtype=np.float32,
+            )
+            .reshape((30, 30, 3))
+            .byteswap()
         )
 
 
