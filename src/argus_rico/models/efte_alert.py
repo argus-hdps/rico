@@ -1,8 +1,12 @@
 import base64
-from typing import List
+from typing import List, Type, TypeVar
 
 import blosc
+import numpy as np
+import orjson
 from pydantic import BaseModel
+
+EFTEAlertType = TypeVar("EFTEAlertType", bound="EFTEAlert")
 
 
 class EFTECandidate(BaseModel):
@@ -54,7 +58,9 @@ class EFTECandidate(BaseModel):
 
     @property
     def stamp(self):
-        return blosc.decompress(base64.b64decode(self.stamp_bytes))
+        return np.frombuffer(
+            blosc.decompress(base64.b64decode(self.stamp_bytes)), dtype=np.float32
+        )
 
 
 # Create a Pydantic model for the 'xmatch' list of dictionaries
@@ -76,3 +82,9 @@ class EFTEAlert(BaseModel):
     objectId: str
     candidate: EFTECandidate
     xmatch: List[XMatchItem]
+
+    @classmethod
+    def from_json(cls: Type[EFTEAlertType], json_path: str) -> EFTEAlertType:
+        with open(json_path, "rb") as f:
+            alert = orjson.loads(f.read())
+        return cls(**alert)
