@@ -58,7 +58,7 @@ class RawAlertStreamer(Producer):
 
         records = []
         for r in tab:
-            stamp = blosc.compress(r["stamp_bytes"].tobytes())
+            stamp = blosc.compress(r["stamp"].tobytes())
             record = dict(r)
             record["stamp_bytes"] = stamp
             record["epoch"] = mjd

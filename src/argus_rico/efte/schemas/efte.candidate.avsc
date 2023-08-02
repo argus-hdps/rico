@@ -182,7 +182,7 @@
             "type": "float"
         },
         {
-            "name": "stamp_bytes",
+            "name": "stamp_bytes ",
             "type": "bytes"
         }
     ]
