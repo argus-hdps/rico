@@ -1,8 +1,10 @@
 """Ray-parallelizable EFTE catalog reducer."""
+import os
+
 import astropy.table as tbl
 import ray
 
-from .. import catalogs
+from .. import catalogs, get_logger, utils
 from .stream import EFTEAlertStreamer
 from .vetnet import VetNet
 
@@ -15,6 +17,8 @@ class EFTECatalogProcessor:
         self.atlas = catalogs.ATLASRefcat2()
         self.producer = EFTEAlertStreamer()
 
+        self.log = get_logger(__name__)
+
     def process(self, filepath: str) -> None:
         """Perform vetting and crossmatching for the given FITS table.
 
@@ -24,18 +28,23 @@ class EFTECatalogProcessor:
         Returns:
             Table: Returns the FITS table with normalized stamps, scores.
         """
+        clock = utils.Timer(log=self.log)
+        name = os.path.basename(filepath)
         table: tbl.Table = tbl.Table.read(filepath, format="fits")
+        clock.ping(f"Read {len(table)} candidates from {name}")
 
         stamps = table["stamp"].data
         mean_pred, _, _, confidence = self.vetnet.mc_predict(stamps, 10)
+        clock.ping(f"Vetted candidates from {name}")
 
-        table["vetnet"] = confidence[:, 0]
+        table["vetnet_score"] = confidence[:, 0]
         table = table[mean_pred[:, 0] > 0.5]
+        table = table[table["vetnet_score"] > 0.4]  # fairly arbitrary...
 
-        table = table[table["vetnet"] > 0.4]  # fairly arbitrary...
+        clock.ping(f"Reporting {len(table)} candidates in {name}")
+
         if len(table) == 0:
             return
-
         crossmatches = []
         for r in table:
             phot = self.atlas.radial(
@@ -43,5 +52,7 @@ class EFTECatalogProcessor:
             )
             phot = phot.sort_values(by="separation")
             crossmatches.append(phot.to_dict(orient="records"))
+
+        clock.ping(f"Xmatched {name} with ATLAS Refcat")
 
         self.producer.push_alert(table, crossmatches)

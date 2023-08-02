@@ -1,4 +1,4 @@
-__all__ = ["RawAlertStreamer"]
+__all__ = ["EFTEAlertReceiver", "EFTEAlertStreamer"]
 
 import base64
 import io
@@ -13,87 +13,11 @@ import orjson
 import pandas as pd
 from confluent_kafka import KafkaException
 
-from .. import config
+from .. import config, get_logger
 from ..consumer import Consumer
 from ..producer import Producer
 
 PATH = os.path.realpath(os.path.dirname(__file__))
-
-
-class RawAlertStreamer(Producer):
-    def __init__(self) -> None:
-        """
-        Initialize the RawAlertStreamer instance.
-
-        It inherits from the Producer class and configures the Kafka connection parameters
-        using values from the config dictionary.
-
-        This class is used for streaming raw candidate detections from the
-        observatory to the Rico Kafka cluster.
-
-        The host, port, and topic are retrieved from the config dictionary
-        using the keys 'KAFKA_ADDR', 'KAFKA_PORT', and 'HBEAT_TOPIC' respectively.
-        """
-        super().__init__(
-            host=config.KAFKA_ADDR,
-            port=config.KAFKA_PORT,
-        )
-        self.topic_base = config.RAW_TOPIC_BASE
-
-    def _parse_raw_catalog(self, catalog_path: str) -> Tuple[bytes, Dict[str, Any]]:
-        """
-        Parses a raw catalog file and returns the serialized Avro data.
-
-        Args:
-            catalog_path (str): The path to the catalog file.
-
-        Returns:
-            bytes: The serialized Avro data.
-            dict: Catalog metadata.
-        """
-        tab = tbl.Table.read(catalog_path)
-
-        mjd = tab.meta["MJD"]
-        camera_id = tab.meta["CCDDETID"]
-
-        records = []
-        for r in tab:
-            stamp = base64.b64encode(blosc.compress(r["stamp"].tobytes())).decode(
-                "utf-8"
-            )
-            record = dict(r)
-            record["stamp"] = stamp
-            record["epoch"] = mjd
-            record["camera"] = camera_id
-
-            records.append(record)
-
-        with open(f"{PATH}/schemas/raw_candidate.avsc", "rb") as f:
-            schema = orjson.loads(f.read())
-
-        parsed_schema = fa.parse_schema(schema)
-
-        fo = io.BytesIO()
-        fa.writer(fo, parsed_schema, records)
-        fo.seek(0)
-
-        return fo.read(), tab.meta
-
-    def push_from_catalog(self, catalog_path: str) -> None:
-        """
-        Pushes data from a catalog file to a camera-specific topic.
-
-        Args:
-            catalog_path (str): The path to the catalog file.
-
-        Returns:
-            None
-
-        """
-        avro_data, metadata = self._parse_raw_catalog(catalog_path)
-        topic = self.topic_base + f'.{metadata["CCDDETID"]}'
-
-        self.send_binary(avro_data, topic=topic)
 
 
 class EFTEAlertStreamer(Producer):
@@ -135,6 +59,11 @@ class EFTEAlertStreamer(Producer):
         """
         tab = catalog
 
+        if "MJD" not in tab.meta:
+            tab.meta["MJD"] = 60000.1
+        if "CCDDETID" not in tab.meta:
+            tab.meta["CCDDETID"] = "ML3103817"
+
         mjd = tab.meta["MJD"]
         camera_id = tab.meta["CCDDETID"]
 
@@ -146,11 +75,10 @@ class EFTEAlertStreamer(Producer):
                 "objectId": str(uuid4()),
             }
 
-            stamp = base64.b64encode(blosc.compress(r["stamp"].tobytes())).decode(
-                "utf-8"
-            )
+            stamp = blosc.compress(r["stamp"].data.tobytes())
+
             candidate = dict(r)
-            candidate["stamp"] = stamp
+            candidate["stamp_bytes"] = stamp
             candidate["epoch"] = mjd
             candidate["camera"] = camera_id
 
@@ -206,6 +134,7 @@ class EFTEAlertReceiver(Consumer):
         )
         self.filter_path = filter_path
         self.output_path = output_path
+        self.log = get_logger(__name__)
 
     def poll_and_record(self) -> None:
         """Start polling for Kafka messages and process the candidates based on filter conditions."""
@@ -224,8 +153,8 @@ class EFTEAlertReceiver(Consumer):
                 if event.error():
                     raise KafkaException(event.error())
                 else:
-                    candidates = self._decode(event.value())
-                    self._filter_candidates(candidates)
+                    alerts = self._decode(event.value())
+                    self._filter_to_disk(alerts)
 
         except KeyboardInterrupt:
             print("Canceled by user.")
@@ -249,18 +178,22 @@ class EFTEAlertReceiver(Consumer):
             records.append(record)
         return records
 
-    def _write_candidate(self, candidate: Dict[str, Any]) -> None:
+    def _write_candidate(self, alert: Dict[str, Any]) -> None:
         """Write the candidate data to a JSON file.
 
         Args:
             candidate (Dict[str, Any]): The candidate dictionary to be written to the JSON file.
         """
+        alert["candidate"]["stamp_bytes"] = base64.b64encode(
+            alert["candidate"]["stamp_bytes"]
+        ).decode("utf-8")
         with open(
-            os.path.join(self.output_path, f"{candidate['objectId']}.json"), "w"
+            os.path.join(self.output_path, f"{alert['objectId']}.json"), "wb"
         ) as f:
-            f.write(orjson.dumps(candidate))
+            f.write(orjson.dumps(alert))
+        self.log.info(f'New candidate: {alert["objectId"]}.json')
 
-    def _filter_candidates(self, candidates: List[Dict[str, Any]]) -> None:
+    def _filter_to_disk(self, alerts: List[Dict[str, Any]]) -> None:
         """Filter the candidates based on the specified filter conditions.
 
         Args:
@@ -276,13 +209,13 @@ class EFTEAlertReceiver(Consumer):
                 filter_conditions = file.read().splitlines()
             filter_conditions = [f for f in filter_conditions if len(f) > 3]
 
-        for candidate in candidates:
-            if len(candidate["xmatch"]) > 0 and self.filter_path is not None:
-                xmatch = pd.DataFrame.from_records(candidate["xmatch"])
+        for alert in alerts:
+            if len(alert["xmatch"]) > 0 and self.filter_path is not None:
+                xmatch = pd.DataFrame.from_records(alert["xmatch"])
                 for condition in filter_conditions:
                     column_name, operator, value = condition.split()
                     xmatch = xmatch.query(f"{column_name} {operator} {value}")
                 if len(xmatch) > 0:
-                    self._write_candidate(candidate)
+                    self._write_candidate(alert)
             else:
-                self._write_candidate(candidate)
+                self._write_candidate(alert)
