@@ -18,6 +18,10 @@
             "type": "float"
         },
         {
+            "name": "vetnet_score",
+            "type": "float"
+        },
+        {
             "name": "npix",
             "type": "int"
         },

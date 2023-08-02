@@ -1,5 +1,6 @@
 __all__ = ["RawAlertStreamer"]
 
+import base64
 import io
 import os
 from typing import Any, Dict, List, Optional, Tuple
@@ -12,7 +13,7 @@ import orjson
 import pandas as pd
 from confluent_kafka import KafkaException
 
-from .. import config
+from .. import config, get_logger
 from ..consumer import Consumer
 from ..producer import Producer
 
@@ -132,10 +133,10 @@ class EFTEAlertStreamer(Producer):
         """
         tab = catalog
 
-        if 'MJD' not in tab.meta:
-            tab.meta['MJD'] = 60000.1
-        if 'CCDDETID' not in tab.meta:
-            tab.meta['CCDDETID'] = 'ML3103817'
+        if "MJD" not in tab.meta:
+            tab.meta["MJD"] = 60000.1
+        if "CCDDETID" not in tab.meta:
+            tab.meta["CCDDETID"] = "ML3103817"
 
         mjd = tab.meta["MJD"]
         camera_id = tab.meta["CCDDETID"]
@@ -149,7 +150,7 @@ class EFTEAlertStreamer(Producer):
             }
 
             stamp = blosc.compress(r["stamp"].tobytes())
-            
+
             candidate = dict(r)
             candidate["stamp"] = stamp
             candidate["epoch"] = mjd
@@ -207,6 +208,7 @@ class EFTEAlertReceiver(Consumer):
         )
         self.filter_path = filter_path
         self.output_path = output_path
+        self.log = get_logger(__name__)
 
     def poll_and_record(self) -> None:
         """Start polling for Kafka messages and process the candidates based on filter conditions."""
@@ -225,8 +227,8 @@ class EFTEAlertReceiver(Consumer):
                 if event.error():
                     raise KafkaException(event.error())
                 else:
-                    candidates = self._decode(event.value())
-                    self._filter_candidates(candidates)
+                    alerts = self._decode(event.value())
+                    self._filter_to_disk(alerts)
 
         except KeyboardInterrupt:
             print("Canceled by user.")
@@ -250,18 +252,22 @@ class EFTEAlertReceiver(Consumer):
             records.append(record)
         return records
 
-    def _write_candidate(self, candidate: Dict[str, Any]) -> None:
+    def _write_candidate(self, alert: Dict[str, Any]) -> None:
         """Write the candidate data to a JSON file.
 
         Args:
             candidate (Dict[str, Any]): The candidate dictionary to be written to the JSON file.
         """
+        alert["candidate"]["stamp"] = base64.b64encode(
+            alert["candidate"]["stamp"]
+        ).decode("utf-8")
         with open(
-            os.path.join(self.output_path, f"{candidate['objectId']}.json"), "w"
+            os.path.join(self.output_path, f"{alert['objectId']}.json"), "wb"
         ) as f:
-            f.write(orjson.dumps(candidate))
+            f.write(orjson.dumps(alert))
+        self.log.info(f'New candidate: {alert["objectId"]}.json')
 
-    def _filter_candidates(self, candidates: List[Dict[str, Any]]) -> None:
+    def _filter_to_disk(self, alerts: List[Dict[str, Any]]) -> None:
         """Filter the candidates based on the specified filter conditions.
 
         Args:
@@ -277,13 +283,13 @@ class EFTEAlertReceiver(Consumer):
                 filter_conditions = file.read().splitlines()
             filter_conditions = [f for f in filter_conditions if len(f) > 3]
 
-        for candidate in candidates:
-            if len(candidate["xmatch"]) > 0 and self.filter_path is not None:
-                xmatch = pd.DataFrame.from_records(candidate["xmatch"])
+        for alert in alerts:
+            if len(alert["xmatch"]) > 0 and self.filter_path is not None:
+                xmatch = pd.DataFrame.from_records(alert["xmatch"])
                 for condition in filter_conditions:
                     column_name, operator, value = condition.split()
                     xmatch = xmatch.query(f"{column_name} {operator} {value}")
                 if len(xmatch) > 0:
-                    self._write_candidate(candidate)
+                    self._write_candidate(alert)
             else:
-                self._write_candidate(candidate)
+                self._write_candidate(alert)

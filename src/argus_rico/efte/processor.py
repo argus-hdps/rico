@@ -37,12 +37,12 @@ class EFTECatalogProcessor:
         mean_pred, _, _, confidence = self.vetnet.mc_predict(stamps, 10)
         clock.ping(f"Vetted candidates from {name}")
 
-        table["vetnet"] = confidence[:, 0]
+        table["vetnet_score"] = confidence[:, 0]
         table = table[mean_pred[:, 0] > 0.5]
-        table = table[table["vetnet"] > 0.4]  # fairly arbitrary...
-  
+        table = table[table["vetnet_score"] > 0.4]  # fairly arbitrary...
+
         clock.ping(f"Reporting {len(table)} candidates in {name}")
-        
+
         if len(table) == 0:
             return
         crossmatches = []
