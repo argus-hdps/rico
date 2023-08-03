@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "argus-rico"
-version = "0.1.0"
+version = "0.2.3"
 description = "Transient alert generation and database interaction for Argus and Evryscope"
 authors = ["Hank Corbett"]
 
@@ -33,11 +33,15 @@ scikit-image = "^0.21.0"
 psycopg = "^3.1.9"
 grpcio = "<=1.49.1"
 pre-commit = "^3.3.3"
-qlsc = ">=1.0.6"
+# qlsc = ">=1.0.6"
 astropy-healpix = "^0.7"
 
+[tool.poetry.scripts]
+rico = "argus_rico.cli:main"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
+detect-secrets = "^1.4.0"
+sphinx-click = "^4.4.0"
 pytest = "^6.2"
 mypy = "^0.931"
 isort = "^5.10.1"
@@ -45,13 +49,9 @@ flake8 = "^4.0.1"
 Sphinx = "^7.0.1"
 pre-commit = "^3.3.2"
 ipython = "^8.14.0"
+autodoc-pydantic = {version = "<2.0.0", extras = ["eradatic"]}
+graphviz = "^0.20.1"
 
-
-[tool.poetry.scripts]
-rico = "argus_rico.cli:main"
-
-[tool.poetry.group.dev.dependencies]
-detect-secrets = "^1.4.0"
 
 [tool.isort]
 profile = "black"

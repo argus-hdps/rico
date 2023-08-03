@@ -82,7 +82,7 @@ class ATLASRefcat2:
         radius: float,
         min_g: float = 11.0,
         max_g: float = 16.0,
-        return_area: bool = True,
+        return_area: bool = False,
         grab_closest: bool = False,
         as_pandas: bool = True,
     ) -> Union[pd.DataFrame, pa.Table]:

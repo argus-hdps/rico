@@ -19,6 +19,8 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
+    "sphinx_click",
+    "sphinxcontrib.autodoc_pydantic",
 ]
 
 templates_path = ["_templates"]
@@ -35,3 +37,6 @@ html_theme_options = {
     "announcement": "<em>Important</em>: This package is currently under construction! Contact us for more info.",
 }
 html_title = "Rico Docs"
+
+autodoc_pydantic_model_show_json = True
+autodoc_pydantic_settings_show_json = False

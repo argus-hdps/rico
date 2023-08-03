@@ -43,14 +43,26 @@ def loadcats(directory: str) -> None:
     ew.watch()
 
 
-@click.command("viewstream", short_help="Start Rico event stream monitor.")
+@click.command("stream_json", short_help="Record event stream to local JSON.")
 @click.option(
-    "--filter", "-f", type=click.Path(exists=True, dir_okay=False), default=None
+    "--filter",
+    "-f",
+    type=click.Path(exists=True, dir_okay=False),
+    default=None,
+    help="File containing filters to apply to alert stream",
 )
-@click.option("--outdir", "-o", type=click.Path(file_okay=False), default="rico_alerts")
-@click.option("--group", "-g", type=str, default="argus-spec")
-def viewstream(filter: str, outdir: str, group: str) -> None:
-    """Starts the Rico directory monitor."""
+@click.option(
+    "--outdir",
+    "-o",
+    type=click.Path(file_okay=False),
+    default="rico_alerts",
+    help="Output directory",
+)
+@click.option("--group", "-g", type=str, default="argus-spec", help="Kafka group ID")
+def stream_json(filter: str, outdir: str, group: str) -> None:
+    """Monitor the alert stream and record candidates to local disk in JSON
+    format. Optionally, apply a filter to the events before recording, based on
+    xmatch info."""
     import os
 
     from .efte.stream import EFTEAlertReceiver
@@ -103,4 +115,4 @@ def index_images(cli_config: Config, directories: Sequence[str]) -> None:
 main.add_command(slack)
 main.add_command(index_images)
 main.add_command(loadcats)
-main.add_command(viewstream)
+main.add_command(stream_json)

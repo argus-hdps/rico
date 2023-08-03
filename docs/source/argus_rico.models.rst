@@ -1,10 +1,17 @@
-argus\_rico.models package
-==========================
+
+.. _data_models:
+
+Data Models
+********************
+
+
+Interfaces for Rico data products are built on `Pydantic
+<https://docs.pydantic.dev/latest/>`_. 
 
 Submodules
 ----------
 
-argus\_rico.models.evr\_image module
+Evryscope Images
 ------------------------------------
 
 .. automodule:: argus_rico.models.evr_image
@@ -12,10 +19,10 @@ argus\_rico.models.evr\_image module
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
 
-.. automodule:: argus_rico.models
+EFTE Alerts 
+------------------------------------
+.. automodule:: argus_rico.models.efte_alert
    :members:
    :undoc-members:
    :show-inheritance:

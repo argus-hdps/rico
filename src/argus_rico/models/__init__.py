@@ -10,10 +10,4 @@ __all__ = [
 ]
 
 from .efte_alert import EFTEAlert, EFTECandidate, XMatchItem
-from .evr_image import (
-    EVRImage,
-    EVRImageType,
-    EVRImageUpdate,
-    EVRImageUpdateType,
-    fitspath_to_constructor,
-)
+from .evr_image import EVRImage, EVRImageUpdate, fitspath_to_constructor
