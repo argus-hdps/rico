@@ -20,7 +20,8 @@ from Hera/Argus-HDPS/EFTE, stores them into the relevant data archives, and then
 exports a user interface layer. Hera/Argus-HDPS/EFTE are the authors, Rico is
 the librarian, and users and their programmatic tools are the readers.
 
-  .. warning:: This project is under construction, and currently does not support full functionality or unauthenticated access. Public access is on the roadmap for the v1.0 release.
+.. warning:: This project is under construction, and currently does not support full functionality or unauthenticated access. Public access is on the roadmap for the v1.0 release.
+
 
 
 ******************
@@ -30,18 +31,27 @@ How does it work?
 Rico interfaces with several external data sinks to provide products to users,
 including:
 
-   1. Wasabi S3: Ancillary support products, including machine learning models
-      and reference catalogs
-   2. Kafka: Transient alerts, image metadata, weather data, and images. 
+1. **Wasabi S3:** Ancillary support products, including machine learning models
+   and reference catalogs
+2. **Kafka:** Transient alerts, image metadata, weather data, and images
+3. **MongoDB:** Archival versions of everything that goes through Kafka
 
 
-
+************************
+Where can I get started?
+************************
 
 .. toctree::
    :maxdepth: 1
-   :caption: Contents:
 
    install
+   alerts
+   argus_rico.catalogs
+   argus_rico.models
+   argus_rico.efte
+   argus_rico
+
+   
 
 
 

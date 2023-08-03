@@ -1,4 +1,13 @@
-argus\_rico.efte package
+********************************
+Evryscope Fast Transient Engine (EFTE)
+********************************
+
+This module contains various helper functions and wrappers for interacting with
+products and data flow from the EFTE pipelines. The majority of this
+functionality is exposed via the command line interface, and through models
+documented in :ref:`data_models`. 
+
+API Reference:  argus\_rico.efte 
 ========================
 
 Submodules
