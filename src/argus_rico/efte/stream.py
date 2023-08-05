@@ -111,7 +111,7 @@ class EFTEAlertStreamer(Producer):
 
 class EFTEAlertReceiver(Consumer):
     def __init__(
-        self, group: str, output_path: str, filter_path: Optional[str]
+        self, group: str, output_path: str, filter_path: Optional[str] = None
     ) -> None:
         """Initialize the EFTEAlertReceiver class.
 

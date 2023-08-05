@@ -3,7 +3,7 @@ __all__ = ["images_containing", "get_image_meta", "EVRImageProducer", "EVRImageL
 import datetime
 import glob
 import os
-from typing import Any, Dict, Union
+from typing import Any, Dict, Optional, Union
 
 import astropy.io.fits as fits
 import pandas as pd
@@ -146,17 +146,21 @@ class EVRImageLoader:
         if create_client:
             self.client = MongoClient(config.MONGODB_URI, uuidRepresentation="standard")
 
-    def load_fits(self, path: str) -> None:
+    def load_fits(self, path: str, calibration: Optional[bool] = False) -> None:
         """
         Load FITS file data into the MongoDB collection.
 
         Args:
             path (str): Path to the FITS file.
+            calibration (Optional[str]): True if image is master calibration frame
 
         Returns:
             None
         """
-        img_coll = self.client[config.MONGO_DBNAME].evr_images
+        if calibration:
+            img_coll = self.client[config.MONGO_DBNAME].evr_calibs
+        else:
+            img_coll = self.client[config.MONGO_DBNAME].evr_images
 
         db_img = img_coll.find_one({"basename": os.path.basename(path).split(".")[0]})
         if db_img is None:
