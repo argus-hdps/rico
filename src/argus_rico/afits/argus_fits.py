@@ -239,11 +239,8 @@ class ArgusHDUList:
                 best_header_size = ((len(header_string) // 2880) + 1) * 2880
                 header_format_spec = "%%-%is" % best_header_size
                 header_string = header_format_spec % header_string
-                try:
-                    header = header_string.encode("utf8")
-                except:
-                    print(header_string)
-                    raise Exception
+                header = header_string.encode("utf8")
+                
 
                 outfile.write(header)
 
@@ -316,9 +313,9 @@ def load_hdu_from_file_handle(file_handle, verbose=False):  # noqa: C901
         try:
             if blosc_data:
                 blosc_bytes = file_handle.read(hdu.header['BLOSCBY'])
+                bytes_read = len(blosc_bytes)
                 byte_string = blosc.decompress(blosc_bytes)
                 hdu.data = np.frombuffer(byte_string, dtype=dtype)
-                bytes_read = len(blosc_bytes)
             else:
                 hdu.data = np.fromfile(file_handle, dtype=dtype, count=n_pixels)
                 bytes_read = (
@@ -342,8 +339,10 @@ def load_hdu_from_file_handle(file_handle, verbose=False):  # noqa: C901
         hdu.data = hdu.data.reshape(hdu.header["NAXIS2"], hdu.header["NAXIS1"])
 
         # and read out the alignment blanks so we're in the right place for the next HDU
-        extra_bytes = 2880 - (bytes_read % 2880)
-        file_handle.read(extra_bytes)
+        
+        if bytes_read % 2880 != 0:
+            extra_bytes = 2880 - (bytes_read % 2880)
+            file_handle.read(extra_bytes)
 
     return file_handle, hdu
 
