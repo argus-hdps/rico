@@ -566,7 +566,12 @@ static void (*_cffi_call_python_org)(struct _cffi_externpy_s *, char *);
 
 /************************************************************/
 
-// This code is modified from the astrometry.net C code, as packaged in astropy-healpix
+/*
+# This file is modified from part of the Astrometry.net suite, as packaged
+# in astropy_healpix by NML, 2022. 
+# Licensed under a 3-clause BSD style license - see LICENSE
+*/
+
 #include <stdbool.h>
 #define DEG_PER_RAD 57.295779513082323
 
