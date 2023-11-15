@@ -27,7 +27,7 @@ pymongoarrow = "^1.0.0"
 pandas = "^2.0.2"
 watchdog = "^3.0.0"
 ray = "^2.5.1"
-boto3 = "^1.28.3"
+boto3 = ">1.28.3"
 tensorflow = "^2.13.0"
 scikit-image = "^0.21.0"
 psycopg = "^3.1.9"
@@ -35,6 +35,8 @@ grpcio = "<=1.49.1"
 pre-commit = "^3.3.3"
 # qlsc = ">=1.0.6"
 astropy-healpix = "^0.7"
+# workaround for: https://github.com/python-poetry/poetry-plugin-export/issues/183
+urllib3 = ">=1.25.4,<1.27"
 
 [tool.poetry.scripts]
 rico = "argus_rico.cli:main"
