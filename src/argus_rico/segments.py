@@ -2,6 +2,7 @@ import glob
 import multiprocessing as mp
 import operator
 import os
+import warnings
 from functools import reduce
 
 import astropy.coordinates as acrd
@@ -29,7 +30,7 @@ class SegmentArchiveException(Exception):
 
 
 class SegmentArchive:
-    def __init__(self, root):
+    def __init__(self, root, load_index=True):
         self.root = root
 
         # Note: This should be pulled from a manifest in the root directory
@@ -64,7 +65,11 @@ class SegmentArchive:
                 ahpx.HEALPix(nside=nside, order="nested", frame=acrd.ICRS())
             )
 
-        self.pixels = self._traverse()
+        self.indexed = False
+        if load_index:
+            self._load_index()
+        else:
+            self.pixels = self._traverse()
         self._pixcache = None
 
     def _traverse(self):
@@ -77,13 +82,12 @@ class SegmentArchive:
         for fqi in fqhipix:
             ipix = str(int(fqi.split("/")[-1]))
             pixels[ipix] = {"path": fqi}
-
         return pixels
 
     def _index_ipix(self, pix):
         nights = glob.glob(os.path.join(self.pixels[pix]["path"], "????????.fits"))
         pixel_dict = {}
-        pixel_dict[pix] = {}
+        pixel_dict[pix] = self.pixels[pix]
         pixel_dict[pix]["nights"] = {}
         for night in nights:
             if self._pixcache is not None and night in self._pixcache[pix]["nights"]:
@@ -94,9 +98,11 @@ class SegmentArchive:
                 "ntiles_zweighted": 0,
                 "filenames": [],
                 "epochs": [],
+                "data_start_byte": [],
+                "data_size": [],
             }
 
-            ahdulist = arf.open(night)
+            ahdulist = arf.open(night, get_byte_positions=True)
             tile_size = ahdulist[1].data.size
             for tile in ahdulist[1:]:
                 night_dict["ntiles"] += 1
@@ -105,6 +111,9 @@ class SegmentArchive:
                 )
                 night_dict["filenames"].append(tile.header["ORIGNAME"])
                 night_dict["epochs"].append(tile.header["DATE-OBS"])
+                night_dict["data_start_byte"].append(tile.header["_BYTE_START"])
+                night_dict["data_size"].append(tile.header["_NBYTES"])
+
             pixel_dict[pix]["nights"][night] = night_dict
         return pixel_dict
 
@@ -179,8 +188,19 @@ class SegmentArchive:
             }
         )
         pq.write_table(summary_table, summary_path)
+        self.indexed = True
 
         return self.pixels
+
+    def _load_index(self):
+        manifest_path = os.path.join(self.root, "manifest.json")
+        if not os.path.isfile(manifest_path):
+            warnings.warn("No manifest file found! Do you need to index this archive?")
+            return False
+        with open(os.path.join(self.root, "manifest.json"), "rb") as f:
+            manifest = orjson.loads(f.read())
+        self.indexed = True
+        self.pixels = manifest
 
     def get_ipix_path(self, ipix):
         fast_healpixer = fast_healpix.FastHealpix()
@@ -199,3 +219,22 @@ class SegmentArchive:
             path = os.path.join(path, f"{subhealpix:06}")
         path = os.path.join(path, f"{ipix:06}")
         return path
+
+    def index_to_dataframe(self):
+        flat_dict = {"ipix": [], "filename": [], "startbyte": [], "bytesize": []}
+        for ipix in self.pixels:
+            nights = self.pixels[ipix]["nights"]
+            for night in nights:
+                epochs = self.pixels[ipix]["nights"][night]["epochs"]
+                for i in range(len(epochs)):
+                    flat_dict["ipix"].append(ipix)
+                    flat_dict["filename"].append(night)
+                    flat_dict["startbyte"].append(
+                        self.pixels[ipix]["nights"][night]["data_start_byte"][i]
+                    )
+                    flat_dict["bytesize"].append(
+                        self.pixels[ipix]["nights"][night]["data_size"][i]
+                    )
+
+        df = pa.Table.from_pydict(flat_dict).to_pandas()
+        return df

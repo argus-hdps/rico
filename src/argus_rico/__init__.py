@@ -36,7 +36,7 @@ class Config(object):
     SLACK_PORT = os.environ.get("SLACK_PORT") or 3000
 
     LOCAL_ADDR = os.environ.get("LOCAL_ADDR") or "127.0.0.1"
-    INDEX_WORKERS = os.environ.get("INDEX_WORKERS") or 24
+    INDEX_WORKERS = os.environ.get("INDEX_WORKERS") or 12
 
     KAFKA_ADDR = os.environ.get("KAFKA_ADDR") or "127.0.0.1"
     KAFKA_PORT = os.environ.get("KAFKA_PORT") or "9092"

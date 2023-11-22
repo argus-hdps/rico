@@ -1,7 +1,8 @@
 import builtins
-import blosc
+import math
 from collections import OrderedDict
 
+import blosc
 import numpy as np
 
 
@@ -240,7 +241,6 @@ class ArgusHDUList:
                 header_format_spec = "%%-%is" % best_header_size
                 header_string = header_format_spec % header_string
                 header = header_string.encode("utf8")
-                
 
                 outfile.write(header)
 
@@ -256,7 +256,21 @@ class ArgusHDUList:
                         ).tofile(outfile)
 
 
-def load_hdu_from_file_handle(file_handle, verbose=False):  # noqa: C901
+def read_blosc_from(file, index, size, dtype=np.float16, compressed=True):
+    with builtins.open(file, "rb") as f:
+        f.seek(index)
+        bytes_read = f.read(size)
+        if compressed:
+            bytes_read = blosc.decompress(bytes_read)
+        data = np.frombuffer(bytes_read, dtype=dtype)
+        res = int(math.sqrt(data.size))
+        data = data.reshape((res, res))
+    return data
+
+
+def load_hdu_from_file_handle(  # noqa: C901
+    file_handle, verbose=False, get_byte_positions=False
+):
     # loads from open file until end of HDU,
     # then returns the handle for later seeking
     # requires the file to have been opened in "rb" mode
@@ -269,6 +283,8 @@ def load_hdu_from_file_handle(file_handle, verbose=False):  # noqa: C901
         header_string = file_handle.read(2880)
 
         if len(header_string) == 0:
+            if get_byte_positions:
+                return None, None, None, None
             return None, None
 
         if len(header_string) < 80:
@@ -278,18 +294,21 @@ def load_hdu_from_file_handle(file_handle, verbose=False):  # noqa: C901
         if hdu.header.from_string(header_string) is True:
             got_header_end = True
 
+    data_start = file_handle.tell()
     if verbose:
         print("Loaded header:", hdu.header.items())
 
     # now in image section, if there is one
     if hdu.header["NAXIS"] == 2:
-        if 'TTYPE1' in hdu.header:
-            if hdu.header["TTYPE1"] == 'COMPRESSED_DATA':
-                raise ArgusFITSParseError("Image HDUs are compressed, use Astropy instead.")
+        if "TTYPE1" in hdu.header:
+            if hdu.header["TTYPE1"] == "COMPRESSED_DATA":
+                raise ArgusFITSParseError(
+                    "Image HDUs are compressed, use Astropy instead."
+                )
         dtype = None
         byte_swap = True
         if "BLOSC" in hdu.header:
-            blosc_data = hdu.header['BLOSC']
+            blosc_data = hdu.header["BLOSC"]
         else:
             blosc_data = False
 
@@ -306,13 +325,15 @@ def load_hdu_from_file_handle(file_handle, verbose=False):  # noqa: C901
             dtype = np.float64
 
         if dtype is None:
-            raise ArgusFITSParseError(f"Unknown datatype {hdu.header['BITPIX']} NAxis: {hdu.header['NAXIS']}")
+            raise ArgusFITSParseError(
+                f"Unknown datatype {hdu.header['BITPIX']} NAxis: {hdu.header['NAXIS']}"
+            )
 
         n_pixels = hdu.header["NAXIS1"] * hdu.header["NAXIS2"]
 
         try:
             if blosc_data:
-                blosc_bytes = file_handle.read(hdu.header['BLOSCBY'])
+                blosc_bytes = file_handle.read(hdu.header["BLOSCBY"])
                 bytes_read = len(blosc_bytes)
                 byte_string = blosc.decompress(blosc_bytes)
                 hdu.data = np.frombuffer(byte_string, dtype=dtype)
@@ -339,23 +360,39 @@ def load_hdu_from_file_handle(file_handle, verbose=False):  # noqa: C901
         hdu.data = hdu.data.reshape(hdu.header["NAXIS2"], hdu.header["NAXIS1"])
 
         # and read out the alignment blanks so we're in the right place for the next HDU
-        
+
         if bytes_read % 2880 != 0:
             extra_bytes = 2880 - (bytes_read % 2880)
             file_handle.read(extra_bytes)
 
-    return file_handle, hdu
+    else:
+        data_start = 0
+        bytes_read = 2880
+
+    if get_byte_positions:
+        return file_handle, hdu, data_start, bytes_read
+    else:
+        return file_handle, hdu
 
 
-def open(filename, verbose=False):
+def open(filename, verbose=False, get_byte_positions=False):
     hdulist = ArgusHDUList()
 
     # need to do it this way to match astropy's module.open() syntax
     with builtins.open(filename, "rb") as file_handle:
         end_of_file = False
         while not end_of_file:
-            file_handle, hdu = load_hdu_from_file_handle(file_handle, verbose)
+            if get_byte_positions:
+                file_handle, hdu, byte_start, nbytes = load_hdu_from_file_handle(
+                    file_handle, verbose, get_byte_positions=get_byte_positions
+                )
+            else:
+                file_handle, hdu = load_hdu_from_file_handle(file_handle, verbose)
+
             if file_handle is not None:
+                if get_byte_positions:
+                    hdu.header["_BYTE_START"] = byte_start
+                    hdu.header["_NBYTES"] = nbytes
                 hdulist.append(hdu)
             else:
                 end_of_file = True

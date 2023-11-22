@@ -1,3 +1,3 @@
-__all__ = ["ArgusImageHDU", "ArgusHDUList", "open"]
+__all__ = ["ArgusImageHDU", "ArgusHDUList", "open", "read_blosc_from"]
 
-from .argus_fits import ArgusHDUList, open  # noqa: F401
+from .argus_fits import ArgusHDUList, open, read_blosc_from  # noqa: F401
