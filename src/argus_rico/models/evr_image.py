@@ -6,16 +6,18 @@ import warnings
 from typing import Any, Dict, Optional, Type, TypeVar, Union
 
 import astropy.io.fits as fits
+import astropy.units as u
 import astropy.wcs as awcs
+import astropy_healpix as ahpx
 import numpy as np
-import qlsc
 from geojson_pydantic import Polygon
 from pydantic import BaseModel, Field, ValidationError
 
 warnings.simplefilter("ignore", category=awcs.FITSFixedWarning)
 
 
-Q = qlsc.QLSC(depth=30)
+# Q = qlsc.QLSC(depth=30)
+H = ahpx.HEALPix(nside=2**24, order="nested")
 HOSTNAME = socket.gethostname()
 
 
@@ -117,7 +119,10 @@ def fitspath_to_constructor(fitspath: Union[str, fits.HDUList]) -> Dict[str, Any
     constructor_dict["inc_z"] = header["INR1INCZ"]
 
     if "CRVAL1" in header:
-        constructor_dict["qid"] = Q.ang2ipix(header["CRVAL1"], header["CRVAL2"])
+        constructor_dict["hid"] = H.lonlat_to_healpix(
+            header["CRVAL1"] * u.deg, header["CRVAL2"] * u.deg
+        )
+
         constructor_dict["footprint"] = Polygon(**_wcs_to_footprint(header))
         constructor_dict["wcspath"] = os.path.abspath(fitspath)
     else:
@@ -159,7 +164,7 @@ class EVRImage(BaseModel):
     inc_z: Optional[float] = Field(...)
 
     footprint: Optional[Polygon] = Field(...)
-    qid: Optional[int] = Field(...)
+    hid: Optional[int] = Field(...)
 
     class Config:
         """Pydantic configuration."""
@@ -222,7 +227,7 @@ class EVRImageUpdate(BaseModel):
     inc_y: Optional[float]
     inc_z: Optional[float]
     footprint: Optional[Polygon]
-    qid: Optional[int]
+    hid: Optional[int]
 
     class Config:
         """Pydantic configuration."""
