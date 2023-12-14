@@ -3,7 +3,6 @@ __all__ = [
     "EFTECatalogProcessor",
     "EFTECatalogHandler",
     "EFTEWatcher",
-    "VetNet",
     "EFTEAlertStreamer",
     "EFTEAlertReceiver",
 ]
@@ -11,5 +10,4 @@ __all__ = [
 from .efte_runner import EFTERunner
 from .processor import EFTECatalogProcessor
 from .stream import EFTEAlertReceiver, EFTEAlertStreamer
-from .vetnet import VetNet
 from .watchdog import EFTECatalogHandler, EFTEWatcher
