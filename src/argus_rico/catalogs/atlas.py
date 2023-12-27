@@ -64,16 +64,20 @@ class ATLASRefcat2:
         self.table: pa.Table = None
         self.dataset: str = None
 
-        if not os.path.isdir(os.path.join(config.RICO_CACHE_DIR, "atlas_refcat2")):
-            if click.confirm(
-                "ATLAS RefCat not found, do you want to download it (82 GB)?"
-            ):
-                s3share = s3.S3Share()
-                s3share.download_atlas()
+        if os.path.isdir(os.path.join("/etc/rico/atlas_refcat2")):
+            self.dataset = "/etc/rico/atlas_refcat2"
 
-            else:
-                raise MissingDirectoryError("ATLAS Refcat is not installed")
-        self.dataset = os.path.join(config.RICO_CACHE_DIR, "atlas_refcat2")
+        else:
+            if not os.path.isdir(os.path.join(config.RICO_CACHE_DIR, "atlas_refcat2")):
+                if click.confirm(
+                    "ATLAS RefCat not found, do you want to download it (82 GB)?"
+                ):
+                    s3share = s3.S3Share()
+                    s3share.download_atlas()
+
+                else:
+                    raise MissingDirectoryError("ATLAS Refcat is not installed")
+            self.dataset = os.path.join(config.RICO_CACHE_DIR, "atlas_refcat2")
 
     def radial(
         self,
