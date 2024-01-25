@@ -221,7 +221,13 @@ class SegmentArchive:
         return path
 
     def index_to_dataframe(self):
-        flat_dict = {"ipix": [], "filename": [], "startbyte": [], "bytesize": []}
+        flat_dict = {
+            "ipix": [],
+            "filename": [],
+            "startbyte": [],
+            "bytesize": [],
+            "epochs": [],
+        }
         for ipix in self.pixels:
             nights = self.pixels[ipix]["nights"]
             for night in nights:
@@ -234,6 +240,9 @@ class SegmentArchive:
                     )
                     flat_dict["bytesize"].append(
                         self.pixels[ipix]["nights"][night]["data_size"][i]
+                    )
+                    flat_dict["epochs"].append(
+                        self.pixels[ipix]["nights"][night]["epochs"][i]
                     )
 
         df = pa.Table.from_pydict(flat_dict).to_pandas()
