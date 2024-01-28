@@ -1,19 +1,23 @@
 """Ray-parallelizable EFTE catalog reducer."""
+
 import os
 
 import astropy.table as tbl
 import ray
 
-from .. import catalogs, get_logger, utils
+from .. import catalogs, config, get_logger, utils
 from .stream import EFTEAlertStreamer
-from .vetnet import VetNet
+
+if config.RICO_WITH_TF:
+    from .vetnet import VetNet
 
 
 @ray.remote
 class EFTECatalogProcessor:
     def __init__(self):
         """Initialize the EFTECatalogProcessor class."""
-        self.vetnet = VetNet()
+        if config.RICO_WITH_TF:
+            self.vetnet = VetNet()
         self.atlas = catalogs.ATLASRefcat2()
         self.producer = EFTEAlertStreamer()
 
@@ -34,12 +38,13 @@ class EFTECatalogProcessor:
         clock.ping(f"Read {len(table)} candidates from {name}")
 
         stamps = table["stamp"].data
-        mean_pred, _, _, confidence = self.vetnet.mc_predict(stamps, 10)
-        clock.ping(f"Vetted candidates from {name}")
+        if config.RICO_WITH_TF:
+            mean_pred, _, _, confidence = self.vetnet.mc_predict(stamps, 10)
+            clock.ping(f"Vetted candidates from {name}")
 
-        table["vetnet_score"] = confidence[:, 0]
-        table = table[mean_pred[:, 0] > 0.5]
-        table = table[table["vetnet_score"] > 0.4]  # fairly arbitrary...
+            table["vetnet_score"] = confidence[:, 0]
+            table = table[mean_pred[:, 0] > 0.5]
+            table = table[table["vetnet_score"] > 0.4]  # fairly arbitrary...
 
         clock.ping(f"Reporting {len(table)} candidates in {name}")
 

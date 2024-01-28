@@ -63,6 +63,8 @@ class Config(object):
     if not os.path.isdir(RICO_CACHE_DIR):
         os.makedirs(RICO_CACHE_DIR)
 
+    RICO_WITH_TF = os.environ.get("RICO_WITH_TF") or False
+
 
 config = Config()
 
