@@ -228,11 +228,15 @@ class SegmentArchive:
             "startbyte": [],
             "bytesize": [],
             "epochs": [],
+            "fits_index": [],
         }
         for ipix in self.pixels:
             nights = self.pixels[ipix]["nights"]
             for night in nights:
                 epochs = self.pixels[ipix]["nights"][night]["epochs"]
+                fits_index = np.argsort(
+                    self.pixels[ipix]["nights"][night]["data_start_byte"]
+                )
                 for i in range(len(epochs)):
                     flat_dict["ipix"].append(ipix)
                     flat_dict["filename"].append(night)
@@ -245,6 +249,7 @@ class SegmentArchive:
                     flat_dict["epochs"].append(
                         self.pixels[ipix]["nights"][night]["epochs"][i]
                     )
+                    flat_dict["fits_index"].append(fits_index[i] + 1)
 
         df = pa.Table.from_pydict(flat_dict).to_pandas()
         df = df.astype({"ipix": "int32"})
