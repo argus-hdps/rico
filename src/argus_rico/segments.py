@@ -10,6 +10,7 @@ import astropy_healpix as ahpx
 import click
 import numpy as np
 import orjson
+import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
 
@@ -246,4 +247,19 @@ class SegmentArchive:
                     )
 
         df = pa.Table.from_pydict(flat_dict).to_pandas()
+        df = df.astype({"ipix": "int32"})
+
+        nights = [
+            df["filename"][i].split("/")[-1].split(".")[0] for i in range(len(df))
+        ]
+        df["night"] = nights
+        return df
+
+    def _reset_archive_root(self, df: pd.DataFrame, old_root: str, new_root: str):
+        new_fn = []
+        for i in range(len(df)):
+            new_fn.append(df.iloc[i]["filename"].replace(old_root, new_root))
+
+        df.drop("filename", axis=1)
+        df["filename"] = new_fn
         return df
