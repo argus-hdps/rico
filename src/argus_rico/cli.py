@@ -28,7 +28,7 @@ if __name__ == "__main__":
 @click.command("slack", short_help="Start Rico Slack server.")
 def slack() -> None:
     """Starts the Rico Slack server."""
-    from .slack import slack_app_starter
+    from .slack_app import slack_app_starter
 
     slack_app_starter()
 
