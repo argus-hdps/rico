@@ -7,6 +7,7 @@ __all__ = ["get_logger", "config"]
 import importlib.metadata
 import logging
 import os
+import warnings
 
 from dotenv import load_dotenv
 
@@ -18,6 +19,13 @@ if os.path.isfile(os.path.join(os.path.expanduser("~"), ".ricoenv")):
     load_dotenv(os.path.join(os.path.expanduser("~"), ".ricoenv"))
 else:
     load_dotenv(os.path.join(basedir, ".env"))
+
+if os.path.isfile(os.path.join(basedir, ".env")) and os.path.isfile(
+    os.path.join(os.path.expanduser("~"), ".ricoenv")
+):
+    warnings.warn(
+        "Found both user-level (~/.ricoenv) and a .env file in the repo. Using .ricoenv."
+    )
 
 
 class Config(object):

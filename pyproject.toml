@@ -31,13 +31,15 @@ psycopg = ">=3.1.9"
 astropy-healpix = ">=0.7"
 # workaround for: https://github.com/python-poetry/poetry-plugin-export/issues/183
 alembic = {version = ">=1.13.1", optional = true}
+sqlalchemy = "^2.0.28"
+alembic-utils = {version = ">=0.8.2", optional = true}
 
 [tool.poetry.scripts]
 rico = "argus_rico.cli:main"
 
 [tool.poetry.extras]
 tf = ["tensorflow"]
-dbadmin = ["alembic"]
+dbadmin = ["alembic", "alembic-utils"]
 
 [tool.poetry.group.dev.dependencies]
 detect-secrets = ">=1.4.0"
