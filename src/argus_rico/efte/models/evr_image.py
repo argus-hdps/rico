@@ -169,7 +169,7 @@ class EVRImage(BaseModel):
     class Config:
         """Pydantic configuration."""
 
-        allow_population_by_field_name = True
+        populate_by_name = True
 
     @classmethod
     def from_fits(cls: Type[EVRImageType], fitspath: str) -> EVRImageType:
@@ -232,7 +232,7 @@ class EVRImageUpdate(BaseModel):
     class Config:
         """Pydantic configuration."""
 
-        allow_population_by_field_name = True
+        populate_by_name = True
 
     @classmethod
     def from_fits(cls: Type[EVRImageUpdateType], fitspath: str) -> EVRImageUpdateType:

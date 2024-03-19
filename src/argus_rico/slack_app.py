@@ -9,7 +9,7 @@ from sanitize_filename import sanitize
 from slack_bolt import App
 
 from . import config, get_logger
-from . import images as rimages
+from .efte import images as rimages
 from .efte.efte_runner import EFTERunner
 
 log = get_logger("slack_bot")

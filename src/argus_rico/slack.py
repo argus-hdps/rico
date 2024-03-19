@@ -6,8 +6,11 @@ from . import config
 
 
 class SlackRico:
-    def __init__(self):
-        self.sc = sk.WebClient(token=config.SLACK_BOT_TOKEN)
+    def __init__(self, token=None):
+        if token is None:
+            self.sc = sk.WebClient(token=config.SLACK_BOT_TOKEN)
+        else:
+            self.sc = sk.WebClient(token=token)
         self.bot_id = self.sc.api_call("auth.test")["user_id"]
 
     def on_slack_say(self, channel, message):

@@ -7,6 +7,7 @@ __all__ = ["get_logger", "config"]
 import importlib.metadata
 import logging
 import os
+import warnings
 
 from dotenv import load_dotenv
 
@@ -18,6 +19,13 @@ if os.path.isfile(os.path.join(os.path.expanduser("~"), ".ricoenv")):
     load_dotenv(os.path.join(os.path.expanduser("~"), ".ricoenv"))
 else:
     load_dotenv(os.path.join(basedir, ".env"))
+
+if os.path.isfile(os.path.join(basedir, ".env")) and os.path.isfile(
+    os.path.join(os.path.expanduser("~"), ".ricoenv")
+):
+    warnings.warn(
+        "Found both user-level (~/.ricoenv) and a .env file in the repo. Using .ricoenv."
+    )
 
 
 class Config(object):
@@ -53,6 +61,12 @@ class Config(object):
     EFTE_DB_NAME = os.environ.get("EFTE_DB_NAME") or "transients"
     EFTE_DB_USER = os.environ.get("EFTE_DB_USER") or None
     EFTE_DB_PASS = os.environ.get("EFTE_DB_PASS") or None
+
+    HDPS_DB_ADDR = os.environ.get("HDPS_DB_ADDR") or "127.0.0.1"
+    HDPS_DB_PORT = os.environ.get("HDPS_DB_PORT") or 5432
+    HDPS_DB_NAME = os.environ.get("HDPS_DB_NAME") or "hdps"
+    HDPS_DB_USER = os.environ.get("HDPS_DB_USER") or None
+    HDPS_DB_PASS = os.environ.get("HDPS_DB_PASS") or None
 
     WASABI_KEY_ID = os.environ.get("WASABI_KEY_ID") or None
     WASABI_SECRET_KEY = os.environ.get("WASABI_SECRET_KEY") or None

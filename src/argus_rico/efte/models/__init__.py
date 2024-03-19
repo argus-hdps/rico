@@ -1,3 +1,6 @@
+"""This submodule contains pydantic models and dataclasses for serializing/deserializing
+from Kafka."""
+
 __all__ = [
     "EVRImage",
     "EVRImageUpdate",

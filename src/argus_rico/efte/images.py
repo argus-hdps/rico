@@ -11,9 +11,10 @@ import pymongoarrow.monkey
 from pymongo import MongoClient
 from pymongoarrow.api import Schema
 
-from . import config, models
+from .. import config
+from ..producer import Producer
+from . import models
 from .models import fitspath_to_constructor
-from .producer import Producer
 
 pymongoarrow.monkey.patch_all()
 

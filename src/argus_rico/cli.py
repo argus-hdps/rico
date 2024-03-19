@@ -91,7 +91,7 @@ def index_images(cli_config: Config, directories: Sequence[str]) -> None:
     """
     import multiprocessing as mp
 
-    from . import EVRImageLoader
+    from .efte import EVRImageLoader
 
     image_loader = EVRImageLoader(create_client=False)
 
