@@ -34,7 +34,7 @@ def upgrade() -> None:
         sa.Column("wind_speed_kmh", sa.Numeric(precision=5, scale=2), nullable=True),
         sa.Column("pressure_hpa", sa.Numeric(precision=6, scale=2), nullable=True),
         sa.Column("pressure_tempC", sa.Numeric(precision=4, scale=2), nullable=True),
-        sa.Column("ambient_tempc", sa.Numeric(precision=4, scale=2), nullable=True),
+        sa.Column("ambient_tempC", sa.Numeric(precision=4, scale=2), nullable=True),
         sa.Column("station_voltage", sa.Numeric(precision=4, scale=2), nullable=True),
         sa.Column("daylight", sa.Numeric(precision=3, scale=0), nullable=True),
         sa.Column("sky_tempC", sa.Numeric(precision=5, scale=2), nullable=True),
