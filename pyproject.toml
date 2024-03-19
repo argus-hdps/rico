@@ -41,7 +41,7 @@ rico = "argus_rico.cli:main"
 tf = ["tensorflow"]
 dbadmin = ["alembic", "alembic-utils"]
 
-[tool.poetry.group.dev.dependencies]
+[tool.poetry.dev-dependencies]
 detect-secrets = ">=1.4.0"
 sphinx-click = ">=4.4.0"
 pytest = ">=6.2"
