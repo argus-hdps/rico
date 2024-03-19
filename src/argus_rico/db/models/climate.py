@@ -17,7 +17,7 @@ class BoltwoodReport(Base):
     wind_speed_kmh = Column(Numeric(5, 2))
     pressure_hpa = Column(Numeric(6, 2))
     pressure_tempC = Column(Numeric(4, 2))
-    ambient_tempc = Column(Numeric(4, 2))
+    ambient_tempC = Column(Numeric(4, 2))
     station_voltage = Column(Numeric(4, 2))
     daylight = Column(Numeric(3, 0))
     sky_tempC = Column(Numeric(5, 2))
