@@ -3,9 +3,10 @@
 from sqlalchemy import Column, DateTime, Integer, Numeric, String
 
 from . import Base
+from .ts_mixin import TimeSeriesMixin
 
 
-class BoltwoodReport(Base):
+class BoltwoodReport(TimeSeriesMixin, Base):
     __tablename__ = "boltwood_report"
 
     id = Column(Integer, primary_key=True)
@@ -34,7 +35,7 @@ class BoltwoodReport(Base):
     firmware_version = Column(String(5), nullable=False)
 
 
-class PathfinderHVAC(Base):
+class PathfinderHVAC(TimeSeriesMixin, Base):
     __tablename__ = "pathfinder_hvac"
 
     id = Column(Integer, primary_key=True)

@@ -10,7 +10,7 @@ from .. import config
 
 class RicoDBConnectionManager:
     def __enter__(self):
-        db_url_escaped = f"postgresql+psycopg://{config.HDPS_DB_USER}:{quote_plus(config.HDPS_DB_PASS)}@{config.HDPS_DB_ADDR}:{config.HDPS_DB_PORT}".replace(
+        db_url_escaped = f"postgresql+psycopg://{config.HDPS_DB_USER}:{quote_plus(config.HDPS_DB_PASS)}@{config.HDPS_DB_ADDR}:{config.HDPS_DB_PORT}/{config.HDPS_DB_NAME}".replace(
             "%", "%%"
         )
         self.engine = create_engine(db_url_escaped)
@@ -23,7 +23,7 @@ class RicoDBConnectionManager:
 
 class RicoDBSessionManager:
     def __enter__(self):
-        db_url_escaped = f"postgresql+psycopg://{config.HDPS_DB_USER}:{quote_plus(config.HDPS_DB_PASS)}@{config.HDPS_DB_ADDR}:{config.HDPS_DB_PORT}".replace(
+        db_url_escaped = f"postgresql+psycopg://{config.HDPS_DB_USER}:{quote_plus(config.HDPS_DB_PASS)}@{config.HDPS_DB_ADDR}:{config.HDPS_DB_PORT}/{config.HDPS_DB_NAME}".replace(
             "%", "%%"
         )
         self.engine = create_engine(db_url_escaped)
