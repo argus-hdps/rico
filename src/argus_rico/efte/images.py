@@ -145,7 +145,7 @@ class EVRNightSerializer:
         img_model = models.EVRImage.from_fits(image)
         return img_model.model_dump()
 
-    def load_directory(self, dirname: str, write: Optional[bool] = False) -> None:
+    def load_directory(self, dirname: str, write: Optional[bool] = True) -> None:
         """
         Summarize all FITS files from a directory into a single JSON index.
         Convenience function, just loops over a glob result.
