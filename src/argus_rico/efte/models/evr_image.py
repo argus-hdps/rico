@@ -138,7 +138,7 @@ def fitspath_to_constructor(fitspath: Union[str, fits.HDUList]) -> Dict[str, Any
 class EVRImage(BaseModel):
     """Class representing an EVR image."""
 
-    id: str = Field(default_factory=uuid.uuid4, alias="_id")
+    id: Union[str, uuid.UUID] = Field(default_factory=uuid.uuid4, alias="_id")
     camera: Optional[str] = Field(...)
     filter_name: str = Field(...)
     obstime: datetime.datetime = Field(...)
