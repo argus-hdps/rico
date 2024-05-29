@@ -157,7 +157,9 @@ class EVRNightSerializer:
         Returns:
             Dictionary of all image metadata.
         """
-        night_name = os.path.dirname(dirname).split("/")[-1]
+        if dirname[-1] == "/":
+            dirname = dirname[:-1]
+        night_name = dirname.split("/")[-1]
 
         images = glob.glob(os.path.join(dirname, "*.fits"))
         out_dict = {}
