@@ -4,12 +4,6 @@ from typing import Sequence
 import click
 
 
-@click.group()
-def main() -> None:
-    """Console scripts for rico."""
-    pass
-
-
 class Config(object):
     """Contains global options used for all pipeline actions."""
 
@@ -19,6 +13,14 @@ class Config(object):
 
 
 pass_config = click.make_pass_decorator(Config, ensure=True)
+
+
+@click.group()
+@click.option("--ncpus", "-n", nargs=1, type=int, help="Number of spawned processes.")
+@pass_config
+def main(config, ncpus) -> None:
+    """Console scripts for rico."""
+    config.ncpus = ncpus
 
 
 if __name__ == "__main__":
