@@ -173,7 +173,7 @@ class EVRNightSerializer:
                 ),
                 "w",
             ) as f:
-                f.write(orjson.dumps(self.pixels).decode("utf-8"))
+                f.write(orjson.dumps(out_dict).decode("utf-8"))
         return out_dict
 
 
