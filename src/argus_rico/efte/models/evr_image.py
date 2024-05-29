@@ -92,6 +92,9 @@ def fitspath_to_constructor(fitspath: Union[str, fits.HDUList]) -> Dict[str, Any
     if "FIELDID" not in header:
         header["FIELDID"] = 400
 
+    if "RATCHNUM" not in header:
+        header["RATCHNUM"] = -1
+
     constructor_dict = {}
     constructor_dict["camera"] = header["CCDDETID"]
     constructor_dict["filter_name"] = header["FILTER"]
@@ -106,7 +109,7 @@ def fitspath_to_constructor(fitspath: Union[str, fits.HDUList]) -> Dict[str, Any
     constructor_dict["server_name"] = HOSTNAME
     constructor_dict["basename"] = header["ORIGNAME"].split(".")[0]
     constructor_dict["fieldid"] = header["FIELDID"]
-    constructor_dict["ratchnum"] = header["RATCHNUM"]
+    constructor_dict["ratchnum"] = str(header["RATCHNUM"])
     constructor_dict["mount_ha"] = header["MOUNTHA"]
     constructor_dict["sha1"] = header["CHECKSUM"]
     constructor_dict["ccd_ext_temp"] = header["CCDETEMP"]
