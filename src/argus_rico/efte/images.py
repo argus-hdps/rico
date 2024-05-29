@@ -6,6 +6,7 @@ import os
 from typing import Any, Dict, Optional, Union
 
 import astropy.io.fits as fits
+import orjson
 import pandas as pd
 import pymongoarrow.monkey
 from pymongo import MongoClient
@@ -128,6 +129,54 @@ class EVRImageProducer(Producer):
         self.send_json(image_dict, config.EVR_IMAGE_TOPIC)
 
 
+class EVRNightSerializer:
+    """Class for serializing EVRImage data into a JSON index."""
+
+    def _dump_img(self, image: Union[str, fits.HDUList]) -> dict:
+        """Load image, parse with Pydantic model, then dump to a dict.
+
+        Args:
+            image (Union[str, fits.HDUList]): The image to be sent. It can be either a string representing the
+                path to a FITS file or a `fits.HDUList` object.
+
+        Returns:
+            A dictionary of image metadata.
+        """
+        img_model = models.EVRImage.from_fits(image)
+        return img_model.model_dump()
+
+    def load_directory(self, dirname: str, write: Optional[bool] = False) -> None:
+        """
+        Summarize all FITS files from a directory into a single JSON index.
+        Convenience function, just loops over a glob result.
+
+        Args:
+            dirname (str): Directory path containing FITS files.
+            write (bool): Write to file.
+
+        Returns:
+            Dictionary of all image metadata.
+        """
+        night_name = os.path.dirname(dirname).split("/")[-1]
+
+        images = glob.glob(os.path.join(dirname, "*.fits"))
+        out_dict = {}
+        for image in images:
+            out_dict[image] = self._dump_img(image)
+        out_dict = {night_name: out_dict}
+
+        if write:
+            with open(
+                os.path.join(
+                    os.path.abspath(os.path.join(dirname, os.pardir)),
+                    f"{night_name}.json",
+                ),
+                "w",
+            ) as f:
+                f.write(orjson.dumps(self.pixels).decode("utf-8"))
+        return out_dict
+
+
 class EVRImageLoader:
     """Class for loading EVRImage data into a MongoDB collection."""
 
@@ -149,7 +198,7 @@ class EVRImageLoader:
 
     def load_fits(self, path: str, calibration: Optional[bool] = False) -> None:
         """
-        Load FITS file data into the MongoDB collection.
+        Load FITS file metadata into the MongoDB collection.
 
         Args:
             path (str): Path to the FITS file.
@@ -176,6 +225,7 @@ class EVRImageLoader:
     def load_directory(self, dirname: str) -> None:
         """
         Load all FITS files from a directory into the MongoDB collection.
+        Convenience function, just loops over a glob result.
 
         Args:
             dirname (str): Directory path containing FITS files.

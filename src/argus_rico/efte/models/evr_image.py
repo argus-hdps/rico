@@ -77,8 +77,10 @@ def fitspath_to_constructor(fitspath: Union[str, fits.HDUList]) -> Dict[str, Any
     Raises:
         KeyError: If any required FITS header fields are missing.
     """
-    if type(fitspath) is str:
+    if isinstance(fitspath, str):
         hdulist = fits.open(fitspath)
+    elif isinstance(fitspath, fits.HDUList):
+        hdulist = fitspath
 
     if len(hdulist) == 1:
         hdu_num = 0
@@ -182,7 +184,6 @@ class EVRImage(BaseModel):
             An instance of EVRImage.
 
         """
-
         constructor_dict = fitspath_to_constructor(fitspath)
 
         # This is duplicated boiler plate between the Image/ImageUpdate classes

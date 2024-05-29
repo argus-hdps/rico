@@ -78,11 +78,15 @@ def stream_json(filter: str, outdir: str, group: str) -> None:
     ear.poll_and_record()
 
 
-@click.command("index_images", short_help="Index EVR images directly into MongoDB.")
+@click.command(
+    "index_images", short_help="Index EVR images directly, to file or to MongoDB."
+)
 @click.argument("directories", nargs=-1, type=click.Path(exists=True))
+@click.option("--file", "-f", is_flag=True, default=False, help="JSON index")
 @pass_config
-def index_images(cli_config: Config, directories: Sequence[str]) -> None:
-    """Indexes EVR images from the specified directories.
+def index_images(cli_config: Config, directories: Sequence[str], file: bool) -> None:
+    """Indexes EVR images from the specified directories. By default, index into
+    MongoDB. With the `--file` option, index is exclusively a standalone JSON.
 
     Args:
         cli_config: Config object containing global options.
@@ -91,9 +95,14 @@ def index_images(cli_config: Config, directories: Sequence[str]) -> None:
     """
     import multiprocessing as mp
 
-    from .efte import EVRImageLoader
+    if file:
+        from .efte import EVRNightSerializer
 
-    image_loader = EVRImageLoader(create_client=False)
+        image_loader = EVRNightSerializer()
+    else:
+        from .efte import EVRImageLoader
+
+        image_loader = EVRImageLoader(create_client=False)
 
     pool = mp.Pool(cli_config.ncpus)
 
