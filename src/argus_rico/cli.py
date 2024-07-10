@@ -9,14 +9,16 @@ class Config(object):
 
     def __init__(self) -> None:
         self.verbose = False
-        self.ncpus = 72
+        self.ncpus = 36
 
 
 pass_config = click.make_pass_decorator(Config, ensure=True)
 
 
 @click.group()
-@click.option("--ncpus", "-n", nargs=1, type=int, help="Number of spawned processes.")
+@click.option(
+    "--ncpus", "-n", nargs=1, default=36, type=int, help="Number of spawned processes."
+)
 @pass_config
 def main(config, ncpus) -> None:
     """Console scripts for rico."""
@@ -147,7 +149,15 @@ def index_images(
         out_df.to_parquet("summary.parquet")
 
 
+@click.command("gn", short_help="Say goodnight, Gracie!.")
+@pass_config
+def gn(cli_config: Config) -> None:
+    print("Goodnight, Gracie!")
+    print(cli_config.ncpus)
+
+
 main.add_command(slack)
 main.add_command(index_images)
 main.add_command(loadcats)
 main.add_command(stream_json)
+main.add_command(gn)
