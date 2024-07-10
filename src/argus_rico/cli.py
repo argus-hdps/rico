@@ -84,11 +84,27 @@ def stream_json(filter: str, outdir: str, group: str) -> None:
     "index_images", short_help="Index EVR images directly, to file or to MongoDB."
 )
 @click.argument("directories", nargs=-1, type=click.Path(exists=True))
+@click.option("--db", "-d", is_flag=True, default=False, help="MongoDB index")
 @click.option("--file", "-f", is_flag=True, default=False, help="JSON index")
+@click.option(
+    "--summarize", "-s", is_flag=True, default=False, help="Summarize from glob pattern"
+)
 @pass_config
-def index_images(cli_config: Config, directories: Sequence[str], file: bool) -> None:
-    """Indexes EVR images from the specified directories. By default, index into
-    MongoDB. With the `--file` option, index is exclusively a standalone JSON.
+def index_images(
+    cli_config: Config,
+    directories: Sequence[str],
+    db_index: bool,
+    file: bool,
+    summarize: bool,
+) -> None:
+    """Indexes EVR images from the specified directories. With the `--db`
+    option, we index into MongoDB. With the `--file` option, the index is
+    exclusively a standalone JSON.
+
+
+    Finally, with `--summarize`, we can combine many JSON manifests into a
+    flattened Parquet-format table.
+
 
     Args:
         cli_config: Config object containing global options.
@@ -97,30 +113,38 @@ def index_images(cli_config: Config, directories: Sequence[str], file: bool) -> 
     """
     import multiprocessing as mp
 
-    if file:
-        from .efte import EVRNightSerializer
+    from .efte import EVRNightSerializer
 
+    if file:
         image_loader = EVRNightSerializer()
-    else:
+    elif db_index:
         from .efte import EVRImageLoader
 
         image_loader = EVRImageLoader(create_client=False)
 
-    pool = mp.Pool(cli_config.ncpus)
+    if file or db_index:
+        pool = mp.Pool(cli_config.ncpus)
 
-    directories = sorted(directories)
-    n_directories = len(directories)
-    out = []
-    with click.progressbar(
-        pool.imap_unordered(image_loader.load_directory, directories),
-        label="Loading: ",
-        length=n_directories,
-    ) as pbar:
-        for _ in pbar:
-            out.append(_)
+        directories = sorted(directories)
+        n_directories = len(directories)
+        out = []
+        with click.progressbar(
+            pool.imap_unordered(image_loader.load_directory, directories),
+            label="Loading: ",
+            length=n_directories,
+        ) as pbar:
+            for _ in pbar:
+                out.append(_)
 
-    pool.close()
-    pool.join()
+        pool.close()
+        pool.join()
+
+    if summarize:
+        dirnames = [dirname[:-1] for dirname in directories if dirname[-1] == "/"]
+        jsons = [dirname.split("/")[-1] + ".json" for dirname in dirnames]
+
+        out_df = EVRNightSerializer.summarize(jsons)
+        out_df.to_parquet("summary.parquet")
 
 
 main.add_command(slack)

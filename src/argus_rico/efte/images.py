@@ -3,7 +3,7 @@ __all__ = ["images_containing", "get_image_meta", "EVRImageProducer", "EVRImageL
 import datetime
 import glob
 import os
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Optional, Sequence, Union
 
 import astropy.io.fits as fits
 import orjson
@@ -131,6 +131,30 @@ class EVRImageProducer(Producer):
 
 class EVRNightSerializer:
     """Class for serializing EVRImage data into a JSON index."""
+
+    @staticmethod
+    def summarize(jsons: Sequence) -> pd.DataFrame:
+        """Stack a group of JSON files into a single Parquet file."""
+        nights = {}
+        for i, night in enumerate(jsons):
+            with open(night, "rb") as f:
+                dm = orjson.loads(f.read())
+            nights.update(dm)
+
+        dfs = []
+        for night in nights:
+            records = []
+            imgs = nights[night].keys()
+            for img in imgs:
+                record = nights[night][img]
+                record["night"] = night
+                record["path"] = img
+                records.append(record)
+
+            df = pd.DataFrame.from_dict(records)
+            dfs.append(df)
+        df = pd.concat(dfs)
+        return df
 
     def _dump_img(self, image: Union[str, fits.HDUList]) -> dict:
         """Load image, parse with Pydantic model, then dump to a dict.
