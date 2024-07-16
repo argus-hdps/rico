@@ -86,7 +86,7 @@ def stream_json(filter: str, outdir: str, group: str) -> None:
     "index_images", short_help="Index EVR images directly, to file or to MongoDB."
 )
 @click.argument("directories", nargs=-1, type=click.Path(exists=True))
-@click.option("--db", "-d", is_flag=True, default=False, help="MongoDB index")
+@click.option("--db_index", "-d", is_flag=True, default=False, help="MongoDB index")
 @click.option("--file", "-f", is_flag=True, default=False, help="JSON index")
 @click.option(
     "--summarize", "-s", is_flag=True, default=False, help="Summarize from glob pattern"
@@ -142,8 +142,8 @@ def index_images(
         pool.join()
 
     if summarize:
-        dirnames = [dirname[:-1] for dirname in directories if dirname[-1] == "/"]
-        jsons = [dirname.split("/")[-1] + ".json" for dirname in dirnames]
+        dirnames = [dirname[:-1] if dirname[-1] == "/"  else dirname for dirname in directories]
+        jsons = [dirname + ".json" for dirname in dirnames]
 
         out_df = EVRNightSerializer.summarize(jsons)
         out_df.to_parquet("summary.parquet")

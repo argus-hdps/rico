@@ -154,6 +154,8 @@ class EVRNightSerializer:
             df = pd.DataFrame.from_dict(records)
             dfs.append(df)
         df = pd.concat(dfs)
+        df['obstime'] = pd.to_datetime(df['obstime'])
+
         return df
 
     def _dump_img(self, image: Union[str, fits.HDUList]) -> dict:
